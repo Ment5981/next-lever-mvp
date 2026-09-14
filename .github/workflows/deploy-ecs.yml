@@ -1,0 +1,81 @@
+name: Deploy Next.js to Aliyun ECS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ecs-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy to ECS
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      ECS_HOST: ${{ secrets.ECS_HOST }}
+      ECS_PORT: ${{ secrets.ECS_PORT || '22' }}
+      ECS_USER: ${{ secrets.ECS_USER }}
+      DEPLOY_PATH: ${{ secrets.ECS_PATH || '/var/www/next-lever-mvp' }}
+      PM2_APP_NAME: ${{ secrets.PM2_APP_NAME || 'next-lever-mvp' }}
+
+    steps:
+      - name: Validate deployment secrets
+        shell: bash
+        env:
+          ECS_SSH_KEY: ${{ secrets.ECS_SSH_KEY }}
+        run: |
+          set -Eeuo pipefail
+          for name in ECS_HOST ECS_USER ECS_SSH_KEY; do
+            if [ -z "${!name:-}" ]; then
+              echo "Missing required secret: $name" >&2
+              exit 1
+            fi
+          done
+
+      - name: Configure SSH
+        shell: bash
+        env:
+          ECS_SSH_KEY: ${{ secrets.ECS_SSH_KEY }}
+          ECS_KNOWN_HOSTS: ${{ secrets.ECS_KNOWN_HOSTS }}
+        run: |
+          set -Eeuo pipefail
+          install -m 700 -d "$HOME/.ssh"
+          printf '%s\n' "$ECS_SSH_KEY" > "$HOME/.ssh/id_ed25519"
+          chmod 600 "$HOME/.ssh/id_ed25519"
+
+          if [ -n "${ECS_KNOWN_HOSTS:-}" ]; then
+            printf '%s\n' "$ECS_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          else
+            echo "ECS_KNOWN_HOSTS is not set; collecting the host key for this run." >&2
+            ssh-keyscan -p "$ECS_PORT" -H "$ECS_HOST" >> "$HOME/.ssh/known_hosts"
+          fi
+          chmod 644 "$HOME/.ssh/known_hosts"
+
+      - name: Pull and restart application
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          ssh -p "$ECS_PORT" "$ECS_USER@$ECS_HOST" \
+            "DEPLOY_PATH=$(printf '%q' "$DEPLOY_PATH") PM2_APP_NAME=$(printf '%q' "$PM2_APP_NAME") bash -s" <<'REMOTE_SCRIPT'
+          set -Eeuo pipefail
+
+          cd "$DEPLOY_PATH"
+          git fetch origin main
+          git checkout main
+          git pull --ff-only origin main
+          npm ci
+          npm run build
+
+          if pm2 describe "$PM2_APP_NAME" >/dev/null 2>&1; then
+            pm2 restart "$PM2_APP_NAME" --update-env
+          else
+            pm2 start npm --name "$PM2_APP_NAME" -- start
+          fi
+          pm2 save
+          REMOTE_SCRIPT
