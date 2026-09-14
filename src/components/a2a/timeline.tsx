@@ -115,7 +115,7 @@ export function A2ATimeline({ initial }: { initial: WorkspaceState }) {
 
       <Panel
         title="发送申请"
-        subtitle="申请只能由你的授权触发。发送后每个岗位各有一条 Task，全过程的消息与产物都可回看。"
+        subtitle="先授权，再发送。每个岗位一条 Task。"
         aside={
           <Badge tone={authorized ? "good" : "warn"}>
             {authorized ? "已获得用户授权" : "尚未授权"}
@@ -138,7 +138,10 @@ export function A2ATimeline({ initial }: { initial: WorkspaceState }) {
             />
           </div>
 
-          <Notice tone="neutral">{state.a2a.compat_note}</Notice>
+          <details className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
+            <summary className="cursor-pointer font-medium text-slate-800">查看协议详情</summary>
+            <p className="mt-2 leading-relaxed">{state.a2a.compat_note}</p>
+          </details>
 
           <div className="flex flex-wrap items-center gap-3">
             <Button onClick={dispatch} busy={busy} disabled={!authorized}>
@@ -161,7 +164,7 @@ export function A2ATimeline({ initial }: { initial: WorkspaceState }) {
 
       <Panel
         title="申请状态"
-        subtitle="申请状态由确定性状态机推进，自由文本不能直接改状态。"
+        subtitle="每个申请都有独立 Task。"
       >
         {state.applications.length === 0 ? (
           <Notice tone="neutral">还没有申请。完成授权后这里才会出现记录。</Notice>
@@ -200,7 +203,7 @@ export function A2ATimeline({ initial }: { initial: WorkspaceState }) {
           <Panel
             key={task.task_id}
             title={jobTitle(task.job_version_id)}
-            subtitle={`Task ${task.task_id} · Context ${task.context_id} · ${task.transport} · 协议 ${task.protocol_version}`}
+            subtitle={`Task ${task.task_id} · ${stateText(task.state)}`}
             aside={
               <Badge tone={STATE_TONE[task.state] ?? "neutral"}>
                 {stateText(task.state)}

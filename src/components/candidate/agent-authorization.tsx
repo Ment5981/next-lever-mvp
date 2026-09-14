@@ -135,8 +135,8 @@ export function AgentAuthorization({ initial }: { initial: WorkspaceState }) {
         </div>
       </div>
       <Panel
-        title="第一步：逐项决定共享什么"
-        subtitle="只有你确认过的事实和面试摘要才会出现在这里。勾选即代表允许共享给你稍后授权的岗位。"
+        title="选择共享内容"
+        subtitle="只展示你确认过的事实和回答。"
         aside={
           <Badge tone={state.disclosure_confirmed ? "good" : "warn"}>
             {state.disclosure_confirmed ? "披露范围已确认" : "披露范围未确认"}
@@ -330,8 +330,8 @@ export function AgentAuthorization({ initial }: { initial: WorkspaceState }) {
       </Panel>
 
       <Panel
-        title="第二步：生成可投递的求职者 Agent"
-        subtitle="材料确认、模拟面试完成、披露范围确认三项齐全才能生成。Agent 只带着上面勾选的内容出去。"
+        title="生成求职者 Agent"
+        subtitle="材料、面试和披露范围确认后才能继续。"
         aside={
           <Badge tone={agent ? "good" : "warn"}>
             {agent ? "Agent 已生成" : "Agent 未生成"}
@@ -398,8 +398,8 @@ export function AgentAuthorization({ initial }: { initial: WorkspaceState }) {
       </Panel>
 
       <Panel
-        title="第三步：选择意向岗位并一次性授权"
-        subtitle="平台不会替你新增岗位。下面每个岗位都写明了它进入候选列表的原因。"
+        title="选择岗位并授权"
+        subtitle="一次授权，明确共享范围。"
         aside={
           <Badge tone={latestAuth ? "good" : "warn"}>
             {latestAuth ? `已授权 ${latestAuth.job_count} 个岗位` : "尚未授权"}

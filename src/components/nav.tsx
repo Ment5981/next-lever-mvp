@@ -2,12 +2,12 @@ import Link from "next/link";
 
 /** 工作台主流程导航。顺序与用户实际走的主流程一致。 */
 export const WORKSPACE_STEPS = [
-  { href: "/employer/job", label: "1 岗位创建" },
-  { href: "/candidate/materials", label: "2 材料与面试" },
-  { href: "/candidate/agent", label: "3 Agent 与授权" },
-  { href: "/a2a", label: "4 A2A 时间线" },
-  { href: "/employer/inbox", label: "5 招聘方工作台" },
-  { href: "/growth", label: "6 成长报告" },
+  { href: "/employer/job", label: "岗位创建" },
+  { href: "/candidate/materials", label: "材料与面试" },
+  { href: "/candidate/agent", label: "Agent 与授权" },
+  { href: "/a2a", label: "A2A 时间线" },
+  { href: "/employer/inbox", label: "招聘方工作台" },
+  { href: "/growth", label: "成长报告" },
 ] as const;
 
 export function Nav({ current }: { current?: string }) {

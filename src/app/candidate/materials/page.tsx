@@ -13,7 +13,7 @@ export default function CandidateMaterialsPage() {
     <PageShell
       current="/candidate/materials"
       title="求职者材料与模拟面试"
-      lead="粘贴简历、项目材料和作品链接，逐条核对提取出的事实与原文引用。模拟面试支持文字或语音回答，语音必须先看转写再确认，摘要也要你点头才会进入 Agent。"
+      lead="提交材料，确认事实，完成岗位模拟面试。"
     >
       <MaterialsWorkbench initial={workspaceSnapshot()} />
     </PageShell>

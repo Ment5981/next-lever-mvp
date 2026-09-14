@@ -133,7 +133,7 @@ export function GrowthReportView({ initial }: { initial: WorkspaceState }) {
     <>
       <Panel
         title="生成报告"
-        subtitle="报告要求三个岗位都已产出 Agent 评估并完成真人确认，避免用一两个样本下结论。"
+        subtitle="三个岗位完成真人确认后生成。"
         aside={
           <Badge tone={ready ? "good" : "warn"}>
             {ready ? "样本已齐" : "样本不足"}
@@ -218,7 +218,7 @@ export function GrowthReportView({ initial }: { initial: WorkspaceState }) {
 
           <Panel
             title="样本与置信度"
-            subtitle="先看样本规模再看结论。分数不做简单平均，置信度由最低单项与均值共同决定，并随样本量缩放。"
+            subtitle="先看样本，再看结论。"
             aside={<Badge tone="neutral">{report.report_id}</Badge>}
           >
             <div className="space-y-4">
@@ -276,7 +276,7 @@ export function GrowthReportView({ initial }: { initial: WorkspaceState }) {
 
           <Panel
             title="四类反馈"
-            subtitle="同一条反馈放在不同类别里含义完全不同，因此分类展示并附原始引用与来源标签。"
+            subtitle="按反馈性质分开查看。"
           >
             <div className="space-y-5">
               {CATEGORY_ORDER.map((category) => {

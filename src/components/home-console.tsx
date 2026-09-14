@@ -63,36 +63,29 @@ export function HomeConsole({ initial }: { initial: WorkspaceState }) {
   return (
     <div className="space-y-5">
       <Panel
-        title="进入工作台"
-        subtitle="两侧入口都是真实流程，不是静态演示页。没有任何密钥时也能走完整条链路。"
+        title="选择入口"
       >
         <div className="grid gap-3 sm:grid-cols-2">
           <Link
-            href="/employer/job"
-            className="rounded-xl border border-slate-200 p-4 transition-colors hover:border-indigo-300 hover:bg-indigo-50/50"
+            href="/candidate/materials"
+            className="group flex min-h-16 items-center justify-between rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 transition-all hover:-translate-y-0.5 hover:border-indigo-400 hover:bg-indigo-100 active:scale-[0.99]"
           >
-            <p className="font-medium text-slate-900">我是招聘方</p>
-            <p className="mt-1 text-sm leading-relaxed text-slate-600">
-              文字或语音描述岗位，回答有限追问，确认可编辑的能力模型与权重，
-              生成岗位版本和招聘方 Agent。
-            </p>
+            <p className="font-medium text-indigo-950">求职者登录</p>
+            <span className="text-lg text-indigo-500 transition-transform group-hover:translate-x-1">→</span>
           </Link>
           <Link
-            href="/candidate/materials"
-            className="rounded-xl border border-slate-200 p-4 transition-colors hover:border-indigo-300 hover:bg-indigo-50/50"
+            href="/employer/job"
+            className="group flex min-h-16 items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 transition-all hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-50/50 active:scale-[0.99]"
           >
-            <p className="font-medium text-slate-900">我是求职者</p>
-            <p className="mt-1 text-sm leading-relaxed text-slate-600">
-              提交简历、项目与作品链接，逐条确认事实证据，完成岗位相关的模拟面试，
-              确认披露范围后生成可投递 Agent。
-            </p>
+            <p className="font-medium text-slate-900">招聘方登录</p>
+            <span className="text-lg text-slate-400 transition-transform group-hover:translate-x-1">→</span>
           </Link>
         </div>
       </Panel>
 
       <Panel
         title="演示控制台"
-        subtitle="Demo 会按真实用户路径依次执行确认披露、生成 Agent、一次性授权、A2A 投递、真人确认、生成成长报告。"
+        subtitle="一键跑完预置案例，查看完整结果。"
         aside={
           <div className="flex flex-wrap gap-2">
             <Button onClick={runDemo} busy={busy === "demo"}>

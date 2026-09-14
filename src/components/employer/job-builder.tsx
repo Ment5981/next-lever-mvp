@@ -155,8 +155,8 @@ export function JobBuilder({ initial }: { initial: WorkspaceState }) {
         </div>
       </div>
       <Panel
-        title="第一步：描述岗位"
-        subtitle="语音入口是可选的。语音转写必须先确认，未确认的转写不会进入岗位模型。"
+        title="描述岗位"
+        subtitle="语音转写确认后才能继续。"
       >
         <div className="space-y-4">
           <div className="grid gap-3 sm:grid-cols-2">
@@ -183,7 +183,7 @@ export function JobBuilder({ initial }: { initial: WorkspaceState }) {
 
           <label className="block">
             <span className="text-sm text-slate-700">
-              岗位描述（职责、必须具备的条件、希望看到的证据）
+              岗位描述与证据要求
             </span>
             <textarea
               value={rawText}
@@ -230,8 +230,8 @@ export function JobBuilder({ initial }: { initial: WorkspaceState }) {
       {draft && (
         <>
           <Panel
-            title="第二步：回答 AI 的有限追问"
-            subtitle={`共 ${draft.clarifications.length} 个问题，都会说明为什么影响判断。可以先跳过，答案会随岗位版本一起留存。`}
+            title="回答关键追问"
+            subtitle={`${draft.clarifications.length} 个问题，可跳过。`}
           >
             <ol className="space-y-3">
               {draft.clarifications.map((question, index) => (
@@ -270,8 +270,8 @@ export function JobBuilder({ initial }: { initial: WorkspaceState }) {
           </Panel>
 
           <Panel
-            title="第三步：编辑能力模型"
-            subtitle="每项都可以改名称、类型、权重、硬性条件、证据标准和评估问题。证据标准决定了求职者要拿什么来证明。"
+            title="编辑能力模型"
+            subtitle="调整能力、权重与硬性条件。"
             aside={
               <div className="flex flex-wrap items-center gap-2">
                 <Badge tone={weights.ok ? "good" : "bad"}>
@@ -398,7 +398,7 @@ export function JobBuilder({ initial }: { initial: WorkspaceState }) {
                         }
                         className="size-4"
                       />
-                      硬性条件（不满足时不会被写成能力不足，而是标注未达标或证据不足）
+                      硬性条件
                     </label>
                     <Button
                       variant="danger"
@@ -446,7 +446,7 @@ export function JobBuilder({ initial }: { initial: WorkspaceState }) {
               {confirmed.company_name} · {confirmed.title}
             </p>
             <Notice tone="info">
-              旧版本会被保留，同一岗位再次确认只会追加新版本，不会静默覆盖已发出的评估口径。
+              旧版本保留，重新确认会生成新版本。Agent Card：
               Agent Card 可以在
               <Link
                 className="mx-1 underline"
@@ -462,7 +462,7 @@ export function JobBuilder({ initial }: { initial: WorkspaceState }) {
 
       <Panel
         title="平台内已有岗位"
-        subtitle="预置案例的三个岗位在同一职能下侧重不同，用来展示同一份材料会得到不同结论。"
+        subtitle="三个岗位，三种判断侧重。"
       >
         <ul className="space-y-3">
           {(state?.jobs ?? []).map((job) => (

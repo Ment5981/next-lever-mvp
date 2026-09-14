@@ -51,8 +51,8 @@ export function InterviewPanel({
 
   return (
     <Panel
-      title="第三步：岗位相关的模拟面试"
-      subtitle="问题围绕目标岗位的能力项生成，3 到 5 个。回答只会被压缩成事实摘要，摘要确认后才进入 Agent。"
+      title="模拟面试"
+      subtitle="回答 3 到 5 个岗位问题。"
       aside={
         <Badge tone={interview?.completed ? "good" : "warn"}>
           {interview?.completed ? "面试已完成确认" : "面试未完成"}

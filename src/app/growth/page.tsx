@@ -13,7 +13,7 @@ export default function GrowthPage() {
     <PageShell
       current="/growth"
       title="成长报告"
-      lead="三个岗位都产出结果后，成长 Agent 才聚合反馈。报告区分跨岗位重复信号、岗位特有要求、材料证据问题和冲突反馈，并给出能产生新证据的成长任务与知乎官方知识资源。"
+      lead="聚合三个岗位的反馈，生成可执行成长任务。"
     >
       <GrowthReportView initial={workspaceSnapshot()} />
     </PageShell>

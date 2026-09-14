@@ -172,8 +172,8 @@ export function MaterialsWorkbench({ initial }: { initial: WorkspaceState }) {
         </div>
       </div>
       <Panel
-        title="第一步：粘贴简历、项目材料与作品链接"
-        subtitle="材料只在服务端内存里用于本次演示，不落盘、不记录完整简历。语音入口只做转写，不上传音频。"
+        title="提交材料"
+        subtitle="粘贴简历、项目和作品链接。"
         aside={
           <Badge tone={materialsConfirmed ? "good" : "warn"}>
             {materialsConfirmed ? "材料已确认" : "材料未确认"}
@@ -316,8 +316,8 @@ export function MaterialsWorkbench({ initial }: { initial: WorkspaceState }) {
       </Panel>
 
       <Panel
-        title="第二步：核对提取出的事实"
-        subtitle="每条事实都保留原文引用片段。你可以修改表述、调整证据等级、确认或删除；未确认的事实不会进入 Agent。"
+        title="确认事实证据"
+        subtitle="确认后的内容才会进入 Agent。"
         aside={
           <div className="flex flex-wrap items-center gap-2">
             {extractMeta && (

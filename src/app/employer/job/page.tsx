@@ -13,7 +13,7 @@ export default function EmployerJobPage() {
     <PageShell
       current="/employer/job"
       title="招聘方岗位创建"
-      lead="用文字或语音把岗位讲一遍，AI 只问真正影响判断的几个问题，然后给出可编辑的能力模型。权重合计必须为 100%，确认后生成不可静默覆盖的岗位版本与招聘方 Agent。"
+      lead="描述岗位，确认能力模型，生成岗位 Agent。"
     >
       <JobBuilder initial={workspaceSnapshot()} />
     </PageShell>
