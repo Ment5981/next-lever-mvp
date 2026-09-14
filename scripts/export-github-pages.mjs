@@ -67,7 +67,7 @@ for (const publicAsset of ["/next-level-cover.png", "/next-level-poster.png"]) {
 for (const [urlPath] of assets) {
   const response = await fetch(`${origin}${urlPath}`);
   if (!response.ok) throw new Error(`无法导出资源 ${urlPath}: HTTP ${response.status}`);
-  const target = join(outputRoot, urlPath.replace(/^\//, ""));
+  const target = join(outputRoot, decodeURIComponent(urlPath.replace(/^\//, "")));
   await mkdir(dirname(target), { recursive: true });
   const buffer = Buffer.from(await response.arrayBuffer());
   await writeFile(target, buffer);
