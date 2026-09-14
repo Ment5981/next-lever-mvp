@@ -1,9 +1,9 @@
+import Link from "next/link";
 import { HomePreview } from "@/components/home-preview";
 import { LandingActions } from "@/components/landing-actions";
 import { Nav } from "@/components/nav";
 import { workspaceSnapshot } from "@/lib/server/snapshot";
 import { ZhihuHotList } from "@/components/zhihu-hot-list";
-import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -12,48 +12,21 @@ export default function Home() {
   return (
     <div className="flex min-h-full flex-col bg-slate-50">
       <Nav />
-
       <main className="flex-1">
         <section className="stage-grid overflow-hidden border-b border-slate-200 bg-white">
           <div className="mx-auto grid max-w-6xl gap-9 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-16">
             <div>
-              <p className="text-xs font-semibold tracking-[0.18em] text-indigo-600 uppercase">
-                AI AGENT × JOB GROWTH
-              </p>
-              <h1 className="mt-4 text-5xl leading-[0.98] font-semibold tracking-[-0.05em] text-slate-950 sm:text-7xl">
-                Next Level
-              </h1>
-              <p className="mt-5 max-w-xl text-xl leading-9 text-slate-700 sm:text-2xl">
-                投出去的简历，第一次有了可追溯的回音。
-              </p>
-              <p className="mt-3 max-w-lg text-sm leading-7 text-slate-500">
-                让 Agent 先替你聊清楚，再把岗位差距变成下一步。
-              </p>
+              <p className="text-xs font-semibold tracking-[0.18em] text-indigo-600 uppercase">AI AGENT × JOB GROWTH</p>
+              <h1 className="mt-4 text-5xl leading-[0.98] font-semibold tracking-[-0.05em] text-slate-950 sm:text-7xl">Next Level</h1>
+              <p className="mt-5 max-w-xl text-xl leading-9 text-slate-700 sm:text-2xl">投出去的简历，第一次有了可追溯的回音。</p>
+              <p className="mt-3 max-w-lg text-sm leading-7 text-slate-500">让 Agent 先替你聊清楚，再把岗位差距变成下一步。</p>
               <div className="mt-7 grid max-w-lg grid-cols-2 gap-2">
-                <Link href="/candidate" className="group flex min-h-14 items-center justify-between rounded-2xl bg-indigo-600 px-4 text-sm font-semibold text-white shadow-lg shadow-indigo-200 transition hover:-translate-y-0.5 hover:bg-indigo-500">
-                  我是求职者 <span className="text-lg transition-transform group-hover:translate-x-1">→</span>
-                </Link>
-                <Link href="/employer" className="group flex min-h-14 items-center justify-between rounded-2xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-900 transition hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-50">
-                  我是招聘方 <span className="text-lg text-slate-400 transition-transform group-hover:translate-x-1">→</span>
-                </Link>
+                <Link href="/candidate" className="group flex min-h-14 items-center justify-between rounded-2xl bg-indigo-600 px-4 text-sm font-semibold text-white shadow-lg shadow-indigo-200 transition hover:-translate-y-0.5 hover:bg-indigo-500">我是求职者 <span className="text-lg transition-transform group-hover:translate-x-1">→</span></Link>
+                <Link href="/employer" className="group flex min-h-14 items-center justify-between rounded-2xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-900 transition hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-50">我是招聘方 <span className="text-lg text-slate-400 transition-transform group-hover:translate-x-1">→</span></Link>
               </div>
-              <Link href="/marketplace" className="group mt-3 block max-w-lg overflow-hidden rounded-3xl bg-[linear-gradient(135deg,#4f46e5_0%,#6366f1_48%,#0f766e_125%)] p-5 text-white shadow-xl shadow-indigo-200 transition hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-300">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-[11px] font-semibold tracking-[0.18em] text-indigo-100 uppercase">NEXT LEVEL MARKETPLACE</p>
-                    <h2 className="mt-2 text-2xl font-semibold tracking-tight">进入求职广场</h2>
-                    <p className="mt-2 text-sm leading-6 text-slate-300">岗位 Agent、求职者 Agent 和成长活动，都在这里发生。</p>
-                  </div>
-                  <span className="grid size-10 shrink-0 place-items-center rounded-full bg-white/20 text-xl text-white transition group-hover:translate-x-1">↗</span>
-                </div>
-                <div className="mt-5 grid grid-cols-3 gap-2 text-xs">
-                  {[["岗位", "先看要求"], ["人才", "先看证据"], ["活动", "补齐能力"]].map(([title, detail]) => (
-                    <div key={title} className="rounded-2xl bg-white/15 p-3 ring-1 ring-white/10">
-                      <span className="block font-medium text-white">{title}</span>
-                      <span className="mt-1 block text-indigo-100">{detail}</span>
-                    </div>
-                  ))}
-                </div>
+              <Link href="/marketplace" className="group mt-3 flex max-w-lg items-center justify-between rounded-2xl bg-[linear-gradient(135deg,#ec4899_0%,#f472b6_100%)] px-4 py-3.5 text-white shadow-lg shadow-pink-200 transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-pink-300">
+                <span className="text-base font-semibold tracking-tight">直接进入求职广场</span>
+                <span className="text-xl text-white transition group-hover:translate-x-1">→</span>
               </Link>
             </div>
             <HomePreview initial={snapshot} />
@@ -89,16 +62,9 @@ export default function Home() {
         </section>
 
         <LandingActions initial={snapshot} />
-        <section className="mx-auto w-full max-w-6xl px-4 pb-8 sm:px-6 sm:pb-10">
-          <ZhihuHotList />
-        </section>
+        <section className="mx-auto w-full max-w-6xl px-4 pb-8 sm:px-6 sm:pb-10"><ZhihuHotList /></section>
       </main>
-
-      <footer className="border-t border-slate-200 bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-5 text-xs leading-relaxed text-slate-500 sm:px-6">
-          三个岗位 Agent · 可追溯 Demo · 知乎实时热榜
-        </div>
-      </footer>
+      <footer className="border-t border-slate-200 bg-white"><div className="mx-auto max-w-6xl px-4 py-5 text-xs leading-relaxed text-slate-500 sm:px-6">三个岗位 Agent · 可追溯 Demo · 知乎实时热榜</div></footer>
     </div>
   );
 }
