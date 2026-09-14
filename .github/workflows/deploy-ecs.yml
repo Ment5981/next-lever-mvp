@@ -25,6 +25,9 @@ jobs:
       PM2_APP_NAME: ${{ secrets.PM2_APP_NAME || 'next-lever-mvp' }}
 
     steps:
+      - name: Checkout GitHub version
+        uses: actions/checkout@v4
+
       - name: Validate deployment secrets
         shell: bash
         env:
@@ -57,18 +60,36 @@ jobs:
           fi
           chmod 644 "$HOME/.ssh/known_hosts"
 
-      - name: Pull and restart application
+      - name: Upload and restart application
         shell: bash
         run: |
           set -Eeuo pipefail
-          ssh -p "$ECS_PORT" "$ECS_USER@$ECS_HOST" \
-            "DEPLOY_PATH=$(printf '%q' "$DEPLOY_PATH") PM2_APP_NAME=$(printf '%q' "$PM2_APP_NAME") bash -s" <<'REMOTE_SCRIPT'
+
+          archive_path="$RUNNER_TEMP/next-lever-mvp-$GITHUB_SHA.tar.gz"
+          remote_archive="/tmp/next-lever-mvp-$GITHUB_SHA.tar.gz"
+
+          tar -czf "$archive_path" \
+            --exclude='./.git' \
+            --exclude='./node_modules' \
+            --exclude='./.next' \
+            --exclude='./.env.local' \
+            --exclude='./.env*.local' \
+            .
+
+          scp -P "$ECS_PORT" "$archive_path" "$ECS_USER@$ECS_HOST:$remote_archive"
+
+          remote_command="ARCHIVE_PATH=$(printf '%q' "$remote_archive") DEPLOY_PATH=$(printf '%q' "$DEPLOY_PATH") PM2_APP_NAME=$(printf '%q' "$PM2_APP_NAME") bash -s"
+          ssh -p "$ECS_PORT" "$ECS_USER@$ECS_HOST" "$remote_command" <<'REMOTE_SCRIPT'
           set -Eeuo pipefail
 
+          mkdir -p "$DEPLOY_PATH"
+          tar -xzf "$ARCHIVE_PATH" -C "$DEPLOY_PATH"
+          rm -f "$ARCHIVE_PATH"
+
           cd "$DEPLOY_PATH"
-          git fetch origin main
-          git checkout main
-          git pull --ff-only origin main
+          if [ ! -f .env.local ]; then
+            cp .env.example .env.local
+          fi
           npm ci
           npm run build
 

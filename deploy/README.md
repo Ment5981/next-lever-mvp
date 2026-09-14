@@ -13,22 +13,18 @@ curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
 sudo apt install -y nodejs
 sudo npm install -g pm2
 
-sudo mkdir -p /var/www
-sudo chown -R "$USER":"$USER" /var/www
-git clone https://github.com/Ment5981/next-lever-mvp.git /var/www/next-lever-mvp
-cd /var/www/next-lever-mvp
-cp .env.example .env.local
-nano .env.local
-npm ci
-npm run build
-pm2 start npm --name next-lever-mvp -- start
-pm2 save
+sudo mkdir -p /var/www/next-lever-mvp
+sudo chown -R "$USER":"$USER" /var/www/next-lever-mvp
 pm2 startup
 ```
 
+The GitHub Actions workflow uploads the GitHub `main` source over SSH/SCP,
+creates `.env.local` from `.env.example` when needed, builds the app, and
+restarts PM2. The ECS instance does not need outbound access to GitHub.
+
 Run the `sudo ...` command printed by `pm2 startup`, then run `pm2 save` once more.
 
-Install the reverse-proxy configuration:
+Install the reverse-proxy configuration after the first successful GitHub Actions deployment:
 
 ```bash
 sudo cp deploy/nginx/app.xuanshu.fun.conf /etc/nginx/sites-available/next-lever-mvp
