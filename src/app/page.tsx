@@ -24,9 +24,8 @@ export default function Home() {
                 <Link href="/candidate" className="group flex min-h-14 items-center justify-between rounded-2xl bg-indigo-600 px-4 text-sm font-semibold text-white shadow-lg shadow-indigo-200 transition hover:-translate-y-0.5 hover:bg-indigo-500">我是求职者 <span className="text-lg transition-transform group-hover:translate-x-1">→</span></Link>
                 <Link href="/employer" className="group flex min-h-14 items-center justify-between rounded-2xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-900 transition hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-50">我是招聘方 <span className="text-lg text-slate-400 transition-transform group-hover:translate-x-1">→</span></Link>
               </div>
-              <Link href="/marketplace" className="group mt-3 flex max-w-lg items-center justify-between rounded-2xl bg-[linear-gradient(135deg,#ec4899_0%,#f472b6_100%)] px-4 py-3.5 text-white shadow-lg shadow-pink-200 transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-pink-300">
-                <span className="text-base font-semibold tracking-tight">直接进入求职广场</span>
-                <span className="text-xl text-white transition group-hover:translate-x-1">→</span>
+              <Link href="/marketplace" className="group mt-3 flex max-w-lg items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#ec4899_0%,#f472b6_100%)] px-4 py-3.5 text-white shadow-lg shadow-pink-200 transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-pink-300">
+                <span className="text-base font-semibold tracking-tight">进入求职广场</span>
               </Link>
             </div>
             <HomePreview initial={snapshot} />
