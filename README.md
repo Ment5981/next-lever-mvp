@@ -21,6 +21,22 @@ npm run dev                  # http://localhost:3000
 
 零密钥时 LLM 走 mock，知乎知识列表接口无需鉴权仍返回真实数据，界面上所有演示内容都带「演示数据」标记。
 
+### 配置真实大模型
+
+在本地创建或编辑 `.env.local`，填写一个兼容 OpenAI Chat Completions 的服务地址：
+
+```env
+LLM_API_KEY=你的服务端密钥
+LLM_BASE_URL=https://你的服务商/v1
+LLM_MODEL=你的模型名称
+LLM_REQUEST_TIMEOUT_MS=20000
+LLM_MAX_RETRIES=1
+```
+
+`LLM_BASE_URL` 填到服务商的 API 根地址，程序会自动请求 `${LLM_BASE_URL}/chat/completions`。密钥只放 `.env.local` 或部署平台的服务端环境变量，不要提交到 GitHub。修改后重启 `npm run dev`，首页「演示设置」中的 LLM 状态会从 Mock 变为 Live。
+
+同一套 LLM Provider 会服务岗位结构化、岗位追问、简历事实提取、AI 面试问题、回答摘要和 A2A 岗位评估。成长报告的样本聚合和分组使用确定性规则，知乎内容使用独立的知乎 Provider；两者不会因为 LLM 缺失而中断 Demo。浏览器语音面试当前使用 Web Speech API，音频不会上传。
+
 ## 命令
 
 | 命令 | 用途 |
