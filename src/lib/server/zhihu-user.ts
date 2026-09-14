@@ -47,6 +47,7 @@ async function fetchUserApi<T>(url: string, token: string, params: Record<string
   const response = await fetch(target, {
     headers: {
       accept: "application/json",
+      "content-type": "application/json",
       Authorization: `Bearer ${serverConfig.zhihu.accessSecret}`,
       "X-OAuth-Token": token,
       "X-Request-Timestamp": Math.floor(Date.now() / 1000).toString(),
