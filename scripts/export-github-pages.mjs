@@ -60,6 +60,10 @@ for (const [route] of pages) {
   await writeFile(pageFile, html, "utf8");
 }
 
+for (const publicAsset of ["/next-level-cover.png", "/next-level-poster.png"]) {
+  assets.set(publicAsset, assetPath(publicAsset));
+}
+
 for (const [urlPath] of assets) {
   const response = await fetch(`${origin}${urlPath}`);
   if (!response.ok) throw new Error(`无法导出资源 ${urlPath}: HTTP ${response.status}`);
