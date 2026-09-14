@@ -37,6 +37,24 @@ export default function Home() {
                   我是招聘方 <span className="text-lg text-slate-400 transition-transform group-hover:translate-x-1">→</span>
                 </Link>
               </div>
+              <Link href="/marketplace" className="group mt-3 block max-w-lg overflow-hidden rounded-3xl bg-[linear-gradient(135deg,#4f46e5_0%,#6366f1_48%,#0f766e_125%)] p-5 text-white shadow-xl shadow-indigo-200 transition hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-300">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-[11px] font-semibold tracking-[0.18em] text-indigo-100 uppercase">NEXT LEVEL MARKETPLACE</p>
+                    <h2 className="mt-2 text-2xl font-semibold tracking-tight">进入求职广场</h2>
+                    <p className="mt-2 text-sm leading-6 text-slate-300">岗位 Agent、求职者 Agent 和成长活动，都在这里发生。</p>
+                  </div>
+                  <span className="grid size-10 shrink-0 place-items-center rounded-full bg-white/20 text-xl text-white transition group-hover:translate-x-1">↗</span>
+                </div>
+                <div className="mt-5 grid grid-cols-3 gap-2 text-xs">
+                  {[["岗位", "先看要求"], ["人才", "先看证据"], ["活动", "补齐能力"]].map(([title, detail]) => (
+                    <div key={title} className="rounded-2xl bg-white/15 p-3 ring-1 ring-white/10">
+                      <span className="block font-medium text-white">{title}</span>
+                      <span className="mt-1 block text-indigo-100">{detail}</span>
+                    </div>
+                  ))}
+                </div>
+              </Link>
             </div>
             <HomePreview initial={snapshot} />
           </div>
