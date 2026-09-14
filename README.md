@@ -39,7 +39,7 @@ npm run dev                  # http://localhost:3000
 | `/` | 落地页 + 两个角色入口、岗位 Agent 预览、观看完整 Demo |
 | `/candidate` | 求职者空间：建立 Agent、发布到求职广场、进入对话 |
 | `/employer` | 招聘方空间：生成岗位 Agent、发布岗位、查看候选人对话 |
-| `/marketplace` | 求职广场：浏览岗位 Agent、查看对话和评估结果 |
+| `/marketplace` | 求职广场：岗位与求职者 Agent 图文瀑布流、详情和 A2A 对话 |
 | `/candidate/workbench` | 求职者工作台索引：材料、授权、A2A、成长报告 |
 | `/employer/workbench` | 招聘方工作台索引：岗位、A2A、证据和真人决策 |
 | `/account` | 知乎登录用户页：基础资料、创作列表、关注列表与加载更多 |

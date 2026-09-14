@@ -6,5 +6,5 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "求职广场 · Next Level" };
 
 export default function MarketplacePage() {
-  return <PageShell current="/marketplace" title="求职广场" lead="浏览岗位 Agent，开始一场有证据的对话。"><Marketplace initial={workspaceSnapshot()} /></PageShell>;
+  return <PageShell current="/marketplace" title="求职广场" lead="浏览岗位与求职者 Agent，先看清，再开始对话。"><Marketplace initial={workspaceSnapshot()} /></PageShell>;
 }
