@@ -48,30 +48,7 @@ export function LandingActions({ initial }: { initial: WorkspaceState }) {
 
   return (
     <section className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Link
-          href="/candidate"
-          className="group flex min-h-20 items-center justify-between rounded-2xl border border-indigo-200 bg-indigo-600 px-5 text-white shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5 hover:bg-indigo-500 active:scale-[0.99]"
-        >
-          <span>
-            <span className="block text-xs text-indigo-200">我是</span>
-            <span className="mt-1 block text-lg font-semibold">求职者登录</span>
-          </span>
-          <span className="text-2xl transition-transform group-hover:translate-x-1">→</span>
-        </Link>
-        <Link
-          href="/employer"
-          className="group flex min-h-20 items-center justify-between rounded-2xl border border-slate-300 bg-white px-5 text-slate-900 transition-all hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-50 active:scale-[0.99]"
-        >
-          <span>
-            <span className="block text-xs text-slate-400">我是</span>
-            <span className="mt-1 block text-lg font-semibold">招聘方登录</span>
-          </span>
-          <span className="text-2xl text-slate-400 transition-transform group-hover:translate-x-1">→</span>
-        </Link>
-      </div>
-
-      <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+      <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
         <div>
           <p className="text-sm font-semibold text-slate-900">先看完整 Demo</p>
           <p className="mt-1 text-xs text-slate-500">三场 Agent 对话 · 一份提升安排。</p>

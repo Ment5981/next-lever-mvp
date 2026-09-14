@@ -89,7 +89,7 @@ export function RoleHub({ role, initial }: { role: Role; initial: WorkspaceState
           <>
             <StepCard index="01" title="建立我的 Agent" detail="材料与面试回答，由你确认后生成。" href="/candidate/materials" complete={initial.candidate.materials_confirmed} tone="indigo" />
             <StepCard index="02" title="发布到求职广场" detail="选择公开范围，找到合适的岗位 Agent。" href="/marketplace" complete={published} tone="indigo" />
-            <StepCard index="03" title="查看对话与成长" detail="看反馈，找到下一件能产生证据的事。" href="/candidate/workbench" complete={initial.reports.length > 0} tone="indigo" />
+            <StepCard index="03" title="管理 Agent 与成长" detail="看对话反馈，继续补齐能力。" href="/candidate/workbench" complete={initial.reports.length > 0} tone="indigo" />
           </>
         ) : (
           <>
@@ -104,7 +104,7 @@ export function RoleHub({ role, initial }: { role: Role; initial: WorkspaceState
         <Panel
           title="我的 Agent"
           subtitle={candidateReady ? "已准备好进入求职广场。" : "完成材料确认后，这里会出现你的 Agent。"}
-          aside={<Link href="/candidate/agent" className="text-sm font-medium text-indigo-700">查看设置 →</Link>}
+          aside={<Link href="/candidate/workbench" className="text-sm font-medium text-indigo-700">进入工作台 →</Link>}
         >
           {candidateReady ? (
             <div className="flex flex-col gap-3 rounded-2xl border border-indigo-200 bg-indigo-50 p-4 sm:flex-row sm:items-center sm:justify-between">

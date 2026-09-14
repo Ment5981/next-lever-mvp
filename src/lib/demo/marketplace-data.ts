@@ -31,6 +31,22 @@ export type CandidateListing = {
   availability: string;
 };
 
+export type ActivityListing = {
+  id: string;
+  title: string;
+  subtitle: string;
+  image: string;
+  organizer: string;
+  category: string;
+  format: string;
+  deadline: string;
+  location: string;
+  description: string;
+  fit: string;
+  deliverables: string[];
+  url: string;
+};
+
 export const MARKET_IMAGES = {
   research: "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1200&q=85",
   delivery: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=85",
@@ -56,6 +72,99 @@ export const EXTRA_JOB_LISTINGS: Array<JobMarketInfo & { id: string; company: st
   { id: "demo_job_d", company: "知行工作室", title: "AI 产品实习生", subtitle: "内容工具与用户增长", image: MARKET_IMAGES.presentation, location: "杭州 · 余杭", salary: "6–10K", experience: "在校生", education: "本科", industry: "内容科技", size: "50–99人", stage: "天使轮", recruiter: "沈予", recruiterRole: "招聘负责人", benefits: ["导师带教", "每周 Demo", "实习转正", "餐补"], responsibilities: ["协助拆解用户反馈，整理产品机会。", "参与 AI 内容工具的体验设计和测试。", "跟进小功能上线后的数据反馈。"], requirements: ["对 AI 产品有持续观察和动手尝试。", "能用作品或项目说明自己的思考。", "愿意快速验证，而不是只写方案。"] },
   { id: "demo_job_e", company: "栖木智能", title: "AI 用户体验设计师", subtitle: "智能工作流与体验设计", image: MARKET_IMAGES.design, location: "广州 · 天河", salary: "12–20K", experience: "1–3年", education: "本科", industry: "智能软件", size: "100–499人", stage: "A轮", recruiter: "苏棠", recruiterRole: "设计负责人", benefits: ["设计评审", "弹性工作", "项目奖金", "年度体检"], responsibilities: ["把复杂的 AI 能力设计成容易理解的工作流。", "参与从用户研究到交互原型的完整过程。", "和研发一起验证真实使用体验。"], requirements: ["有完整的产品体验案例。", "理解 AI 产品的不确定性和反馈机制。", "能清楚表达设计取舍。"] },
   { id: "demo_job_f", company: "未完科技", title: "AI 解决方案顾问", subtitle: "从客户问题到落地方案", image: MARKET_IMAGES.team, location: "成都 · 高新区", salary: "14–24K", experience: "1–3年", education: "本科", industry: "企业 AI", size: "100–499人", stage: "B轮", recruiter: "陈默", recruiterRole: "解决方案负责人", benefits: ["客户共创", "项目奖金", "出差补贴", "技术分享"], responsibilities: ["和客户一起定义问题与成功指标。", "将 AI 能力组织成可落地的解决方案。", "跟进交付效果并沉淀可复用方法。"], requirements: ["有 B 端项目、咨询或交付经历。", "能把抽象技术翻译成业务语言。", "习惯用结果验证方案。"] },
+];
+
+export const ACTIVITY_LISTINGS: ActivityListing[] = [
+  {
+    id: "activity_zhihu_hackathon",
+    title: "知乎黑客松 · AI Agent 赛道",
+    subtitle: "用一个真实 Agent 作品补齐 AI 落地证据",
+    image: MARKET_IMAGES.technology,
+    organizer: "知乎开发者社区",
+    category: "黑客松",
+    format: "线上提交 · 团队协作",
+    deadline: "报名信息以官方页面为准",
+    location: "线上",
+    description: "围绕知乎开放能力做一个可运行的 AI Agent，适合把想法推进成可以展示、可以复盘的作品。",
+    fit: "适合补齐 AI 能力理解、Agent 工作流和作品证据。",
+    deliverables: ["可访问 Demo", "产品说明与演示视频", "复盘与迭代记录"],
+    url: "https://developer.zhihu.com/",
+  },
+  {
+    id: "activity_github_good_first_issue",
+    title: "GitHub Good First Issue",
+    subtitle: "从一次真实开源贡献开始",
+    image: MARKET_IMAGES.team,
+    organizer: "开源社区项目",
+    category: "开源",
+    format: "异步协作",
+    deadline: "长期开放",
+    location: "线上",
+    description: "从适合新贡献者的 Issue 入手，完成一次代码、文档或测试贡献，并留下可验证的合并记录。",
+    fit: "适合补齐工程协作、问题拆解和交付结果。",
+    deliverables: ["Issue 讨论记录", "Pull Request", "贡献复盘"],
+    url: "https://goodfirstissue.dev/",
+  },
+  {
+    id: "activity_hacktoberfest",
+    title: "Hacktoberfest 开源实践",
+    subtitle: "连续完成几次小而真实的贡献",
+    image: MARKET_IMAGES.presentation,
+    organizer: "DigitalOcean 社区",
+    category: "开源",
+    format: "公开协作",
+    deadline: "年度活动 · 以官方页面为准",
+    location: "线上",
+    description: "围绕真实开源项目提交贡献，训练从阅读上下文、沟通方案到完成交付的完整过程。",
+    fit: "适合把学习内容变成公开、可追踪的证据。",
+    deliverables: ["公开贡献记录", "合入的 PR 或文档", "个人复盘"],
+    url: "https://hacktoberfest.com/",
+  },
+  {
+    id: "activity_agent_practice",
+    title: "Agent 产品真实场景挑战",
+    subtitle: "把一个用户问题做成可运行原型",
+    image: MARKET_IMAGES.research,
+    organizer: "Next Level 社区演示活动",
+    category: "实践",
+    format: "两周冲刺",
+    deadline: "每月开放一期",
+    location: "线上",
+    description: "选择一个真实用户问题，完成调研、原型、验证和复盘，重点看结果是否能被别人使用和理解。",
+    fit: "适合补齐用户研究与产品闭环证据。",
+    deliverables: ["用户访谈摘要", "可运行原型", "上线或测试数据"],
+    url: "https://github.com/topics/hackathon",
+  },
+  {
+    id: "activity_gsoc",
+    title: "Google Summer of Code",
+    subtitle: "在开源组织中完成一段正式项目",
+    image: MARKET_IMAGES.design,
+    organizer: "Google Open Source",
+    category: "开源项目",
+    format: "导师制项目",
+    deadline: "年度申请 · 以官方页面为准",
+    location: "线上",
+    description: "在开源组织和导师的协作下完成一个有明确里程碑的项目，沉淀长期项目能力和公开成果。",
+    fit: "适合需要系统补齐工程实践和项目交付的人。",
+    deliverables: ["项目提案", "阶段性代码贡献", "最终成果报告"],
+    url: "https://summerofcode.withgoogle.com/",
+  },
+  {
+    id: "activity_open_source_agent",
+    title: "开源 Agent 共创周",
+    subtitle: "和其他开发者一起打磨一个 Agent",
+    image: MARKET_IMAGES.delivery,
+    organizer: "AI 开发者社区",
+    category: "实践",
+    format: "线上共创",
+    deadline: "长期开放",
+    location: "线上",
+    description: "围绕一个明确场景协作完成 Agent、工具调用和评测，适合把零散实验整理成可展示的项目。",
+    fit: "适合补齐 Agent 架构、评测和团队协作证据。",
+    deliverables: ["Agent Demo", "评测样例", "开源仓库与说明"],
+    url: "https://github.com/topics/ai-agents",
+  },
 ];
 
 export const CANDIDATE_LISTINGS: CandidateListing[] = [

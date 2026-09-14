@@ -449,7 +449,7 @@ export function MaterialsWorkbench({ initial }: { initial: WorkspaceState }) {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-slate-600">完成材料和 AI 面试后，去广场认识合适的岗位。</p>
           <Link
-            href="/candidate/agent"
+            href="/candidate/workbench"
             className="inline-flex min-h-10 items-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-500"
           >
             去发布
