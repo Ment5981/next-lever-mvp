@@ -1,5 +1,5 @@
-import { HomeConsole } from "@/components/home-console";
 import { HomePreview } from "@/components/home-preview";
+import { LandingActions } from "@/components/landing-actions";
 import { Nav } from "@/components/nav";
 import { workspaceSnapshot } from "@/lib/server/snapshot";
 
@@ -32,9 +32,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="console" className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
-          <HomeConsole initial={snapshot} />
-        </section>
+        <LandingActions initial={snapshot} />
       </main>
 
       <footer className="border-t border-slate-200 bg-white">

@@ -5,6 +5,11 @@ const origin = process.env.NEXT_PUBLIC_EXPORT_ORIGIN || "http://localhost:3210";
 const outputRoot = join(process.cwd(), "docs");
 const pages = [
   ["", "首页"],
+  ["candidate", "求职者空间"],
+  ["marketplace", "求职广场"],
+  ["employer", "招聘方空间"],
+  ["candidate/workbench", "求职者工作台"],
+  ["employer/workbench", "招聘方工作台"],
   ["employer/job", "岗位创建"],
   ["candidate/materials", "材料与面试"],
   ["candidate/agent", "Agent 与授权"],

@@ -1,14 +1,16 @@
 import Link from "next/link";
 
 /** 工作台主流程导航。顺序与用户实际走的主流程一致。 */
-export const WORKSPACE_STEPS = [
-  { href: "/employer/job", label: "岗位创建" },
-  { href: "/candidate/materials", label: "材料与面试" },
-  { href: "/candidate/agent", label: "Agent 与授权" },
-  { href: "/a2a", label: "A2A 时间线" },
-  { href: "/employer/inbox", label: "招聘方工作台" },
-  { href: "/growth", label: "成长报告" },
+export const PRIMARY_NAV = [
+  { href: "/marketplace", label: "求职广场" },
+  { href: "/candidate", label: "求职者" },
+  { href: "/employer", label: "招聘方" },
 ] as const;
+
+function activeFor(current: string | undefined, href: string) {
+  if (!current) return false;
+  return current === href || current.startsWith(`${href}/`);
+}
 
 export function Nav({ current }: { current?: string }) {
   return (
@@ -32,8 +34,8 @@ export function Nav({ current }: { current?: string }) {
             </span>
           </Link>
           <ul className="-mx-1 flex snap-x gap-1 overflow-x-auto pb-0.5 text-xs [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {WORKSPACE_STEPS.map((step) => {
-              const active = current === step.href;
+            {PRIMARY_NAV.map((step) => {
+              const active = activeFor(current, step.href);
               return (
                 <li key={step.href} className="snap-start">
                   <Link
@@ -50,6 +52,18 @@ export function Nav({ current }: { current?: string }) {
                 </li>
               );
             })}
+            <li className="snap-start">
+              <Link
+                href="/candidate/workbench"
+                className={`inline-block rounded-lg px-2.5 py-1.5 whitespace-nowrap ${
+                  current?.includes("/workbench")
+                    ? "bg-indigo-600 text-white"
+                    : "text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                工作台
+              </Link>
+            </li>
           </ul>
         </div>
       </div>

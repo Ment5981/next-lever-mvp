@@ -36,7 +36,12 @@ npm run dev                  # http://localhost:3000
 
 | 路径 | 内容 |
 | --- | --- |
-| `/` | 落地页 + 工作台入口、观看完整 Demo、Reset、Provider 状态 |
+| `/` | 落地页 + 两个角色入口、岗位 Agent 预览、观看完整 Demo |
+| `/candidate` | 求职者空间：建立 Agent、发布到求职广场、进入对话 |
+| `/employer` | 招聘方空间：生成岗位 Agent、发布岗位、查看候选人对话 |
+| `/marketplace` | 求职广场：浏览岗位 Agent、查看对话和评估结果 |
+| `/candidate/workbench` | 求职者工作台索引：材料、授权、A2A、成长报告 |
+| `/employer/workbench` | 招聘方工作台索引：岗位、A2A、证据和真人决策 |
 | `/employer/job` | 岗位创建：文字/语音、AI 追问、能力模型编辑、权重校验、确认版本 |
 | `/candidate/materials` | 材料提取与模拟面试：证据逐条确认、语音转写修正 |
 | `/candidate/agent` | 求职者 Agent 与岗位授权：逐项预览披露字段、一次性授权 |
