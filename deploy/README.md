@@ -45,7 +45,8 @@ sudo certbot --nginx -d app.xuanshu.fun
 
 ## GitHub Actions secrets
 
-Add these secrets to the repository's `production` environment:
+Add these secrets to the repository's `production 3.` environment (or change
+the workflow's `environment` value if you rename it):
 
 - `ECS_HOST`: ECS public IPv4 address
 - `ECS_PORT`: `22`

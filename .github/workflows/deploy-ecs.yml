@@ -16,7 +16,7 @@ jobs:
   deploy:
     name: Deploy to ECS
     runs-on: ubuntu-latest
-    environment: production
+    environment: "production 3."
     env:
       ECS_HOST: ${{ secrets.ECS_HOST }}
       ECS_PORT: ${{ secrets.ECS_PORT || '22' }}
