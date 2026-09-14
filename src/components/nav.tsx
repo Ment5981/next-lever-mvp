@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ZhihuAccount } from "@/components/zhihu-account";
 
 /** 工作台主流程导航。顺序与用户实际走的主流程一致。 */
 export const PRIMARY_NAV = [
@@ -33,8 +34,9 @@ export function Nav({ current }: { current?: string }) {
               </span>
             </span>
           </Link>
-          <ul className="-mx-1 flex snap-x gap-1 overflow-x-auto pb-0.5 text-xs [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {PRIMARY_NAV.map((step) => {
+          <div className="flex min-w-0 items-center gap-2 sm:gap-4">
+            <ul className="-mx-1 flex min-w-0 snap-x gap-1 overflow-x-auto pb-0.5 text-xs [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {PRIMARY_NAV.map((step) => {
               const active = activeFor(current, step.href);
               return (
                 <li key={step.href} className="snap-start">
@@ -51,20 +53,13 @@ export function Nav({ current }: { current?: string }) {
                   </Link>
                 </li>
               );
-            })}
-            <li className="snap-start">
-              <Link
-                href="/candidate/workbench"
-                className={`inline-block rounded-lg px-2.5 py-1.5 whitespace-nowrap ${
-                  current?.includes("/workbench")
-                    ? "bg-indigo-600 text-white"
-                    : "text-slate-600 hover:bg-slate-100"
-                }`}
-              >
-                工作台
-              </Link>
-            </li>
-          </ul>
+              })}
+              <li className="snap-start">
+                <Link href="/candidate/workbench" className={`inline-block rounded-lg px-2.5 py-1.5 whitespace-nowrap ${current?.includes("/workbench") ? "bg-indigo-600 text-white" : "text-slate-600 hover:bg-slate-100"}`}>工作台</Link>
+              </li>
+            </ul>
+            <ZhihuAccount />
+          </div>
         </div>
       </div>
     </nav>

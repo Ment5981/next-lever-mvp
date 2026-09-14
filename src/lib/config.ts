@@ -44,6 +44,23 @@ export const serverConfig = {
     get accessSecret(): string {
       return process.env.ZHIHU_ACCESS_SECRET?.trim() ?? "";
     },
+    get oauthAppId(): string {
+      return (
+        process.env.ZHIHU_OAUTH_APP_ID?.trim() ||
+        process.env.ZHIHU_OAUTH_CLIENT_ID?.trim() ||
+        ""
+      );
+    },
+    get oauthAppKey(): string {
+      return (
+        process.env.ZHIHU_OAUTH_APP_KEY?.trim() ||
+        process.env.ZHIHU_OAUTH_CLIENT_SECRET?.trim() ||
+        ""
+      );
+    },
+    get oauthRedirectUri(): string {
+      return process.env.ZHIHU_OAUTH_REDIRECT_URI?.trim() || "";
+    },
     get appConfigured(): boolean {
       return present("ZHIHU_APP_ID") && present("ZHIHU_APP_KEY");
     },
@@ -90,6 +107,12 @@ export const ZHIHU_ENDPOINTS = {
   storyDetailLegacy: "https://api.zhihu.com/km-indep-home/hackathon/v2/story",
   /** 需要 Access Secret。 */
   search: "https://developer.zhihu.com/api/v1/content/zhihu_search",
+  hotList: "https://developer.zhihu.com/api/v1/content/hot_list",
+  oauthAuthorize: "https://openapi.zhihu.com/authorize",
+  oauthAccessToken: "https://openapi.zhihu.com/access_token",
+  oauthUser: "https://openapi.zhihu.com/user",
+  userContents: "https://developer.zhihu.com/api/v1/user/contents",
+  userFollowees: "https://developer.zhihu.com/api/v1/user/followees",
   quota: "https://developer.zhihu.com/api/v1/quota",
 } as const;
 

@@ -42,6 +42,7 @@ npm run dev                  # http://localhost:3000
 | `/marketplace` | 求职广场：浏览岗位 Agent、查看对话和评估结果 |
 | `/candidate/workbench` | 求职者工作台索引：材料、授权、A2A、成长报告 |
 | `/employer/workbench` | 招聘方工作台索引：岗位、A2A、证据和真人决策 |
+| `/account` | 知乎登录用户页：基础资料、创作列表、关注列表与加载更多 |
 | `/employer/job` | 岗位创建：文字/语音、AI 追问、能力模型编辑、权重校验、确认版本 |
 | `/candidate/materials` | 材料提取与模拟面试：证据逐条确认、语音转写修正 |
 | `/candidate/agent` | 求职者 Agent 与岗位授权：逐项预览披露字段、一次性授权 |
@@ -63,6 +64,22 @@ src/lib/a2a/        协议适配、Agent Card、执行器、传输层、编排
 src/lib/store/      服务端内存单例 + 审计日志
 src/app/api/        Route Handlers，统一返回 {ok,data} / {ok,blockers}
 ```
+
+## 知乎登录与热榜
+
+知乎登录使用黑客松 OAuth Authorization Code 流程：
+
+```text
+/api/auth/zhihu/start → openapi.zhihu.com/authorize
+→ /api/auth/zhihu/callback → openapi.zhihu.com/access_token
+→ openapi.zhihu.com/user
+```
+
+顶部「知乎登录」只保存服务端内存会话的随机 ID；OAuth Token、App Key 和 Access Secret 不进入浏览器、URL、日志、源码或 Git。登录后访问 `/account` 查看用户资料，并按需加载知乎返回的创作与关注列表。
+
+首页的「知乎热榜」通过 `GET /api/zhihu/hot` 按用户点击调用 `developer.zhihu.com/api/v1/content/hot_list`，服务端注入 Access Secret 和秒级 `X-Request-Timestamp` 后返回标题、链接、缩略图和摘要。
+
+本地配置：复制 `.env.example` 为 `.env.local`，填写完整的 `ZHIHU_OAUTH_APP_KEY` 和已登记的 `ZHIHU_OAUTH_REDIRECT_URI`。当前开发环境已配置有效 Access Secret；OAuth AppKey 因用户提供的是脱敏值，仍需补全后才能完成真实登录联调。
 
 关键约束：状态只能由确定性状态机推进，自由文本改不了状态；所有结构化输出经 Zod 校验，
 失败最多重试一次后进入人工复核或 Demo Fallback；简历、岗位文本、知乎内容和 Agent 消息

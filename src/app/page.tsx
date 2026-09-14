@@ -2,6 +2,7 @@ import { HomePreview } from "@/components/home-preview";
 import { LandingActions } from "@/components/landing-actions";
 import { Nav } from "@/components/nav";
 import { workspaceSnapshot } from "@/lib/server/snapshot";
+import { ZhihuHotList } from "@/components/zhihu-hot-list";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +34,9 @@ export default function Home() {
         </section>
 
         <LandingActions initial={snapshot} />
+        <section className="mx-auto w-full max-w-6xl px-4 pb-8 sm:px-6 sm:pb-10">
+          <ZhihuHotList />
+        </section>
       </main>
 
       <footer className="border-t border-slate-200 bg-white">

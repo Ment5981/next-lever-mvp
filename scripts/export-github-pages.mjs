@@ -10,6 +10,7 @@ const pages = [
   ["employer", "招聘方空间"],
   ["candidate/workbench", "求职者工作台"],
   ["employer/workbench", "招聘方工作台"],
+  ["account", "知乎用户"],
   ["employer/job", "岗位创建"],
   ["candidate/materials", "材料与面试"],
   ["candidate/agent", "Agent 与授权"],
