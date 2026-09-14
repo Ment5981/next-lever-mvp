@@ -19,8 +19,8 @@ export default function Home() {
             <div>
               <p className="text-xs font-semibold tracking-[0.18em] text-indigo-600 uppercase">AI AGENT × JOB GROWTH</p>
               <h1 className="mt-4 text-5xl leading-[0.98] font-semibold tracking-[-0.05em] text-slate-950 sm:text-7xl">Next Level</h1>
-              <p className="mt-5 max-w-xl text-xl leading-9 text-slate-700 sm:text-2xl">投出去的简历，第一次有了可追溯的回音。</p>
-              <p className="mt-3 max-w-lg text-sm leading-7 text-slate-500">让 Agent 先替你聊清楚，再把岗位差距变成下一步。</p>
+              <p className="mt-5 max-w-xl text-xl leading-9 text-slate-700 sm:text-2xl">让 Agent 先聊清岗位，再帮你补齐能力。</p>
+              <p className="mt-3 max-w-lg text-sm leading-7 text-slate-500">求职者 Agent 与招聘者 Agent 在广场中自动对话，每一次反馈都变成下一次行动。</p>
               <div className="mt-7 grid max-w-lg grid-cols-2 gap-2">
                 <Link href="/candidate" className="group flex min-h-14 items-center justify-between rounded-2xl bg-indigo-600 px-4 text-sm font-semibold text-white shadow-lg shadow-indigo-200 transition hover:-translate-y-0.5 hover:bg-indigo-500">我是求职者 <span className="text-lg transition-transform group-hover:translate-x-1">→</span></Link>
                 <Link href="/employer" className="group flex min-h-14 items-center justify-between rounded-2xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-900 transition hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-50">我是招聘方 <span className="text-lg text-slate-400 transition-transform group-hover:translate-x-1">→</span></Link>
@@ -37,18 +37,18 @@ export default function Home() {
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-xs font-semibold tracking-[0.16em] text-indigo-600 uppercase">HOW IT WORKS</p>
-              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">一条从材料到成长的工作流</h2>
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">从岗位匹配，到能力提升</h2>
             </div>
-            <p className="text-sm text-slate-500">每一步都由你决定是否继续</p>
+            <p className="text-sm text-slate-500">先对话，再行动</p>
           </div>
           <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {[
-              ["发送材料", "上传简历、项目和作品，让 Agent 先认识你。"],
-              ["AI 模拟面试", "进入实时语音房间，Agent 根据目标岗位追问。"],
-              ["生成个人 Agent", "确认事实和回答，生成可以被看见的自己。"],
-              ["发布到求职广场", "选择披露范围，手动挑选想聊的岗位。"],
-              ["A2A 自动沟通", "你的 Agent 与多个岗位 Agent 对话，留下可追踪反馈。"],
-              ["知乎知识与行动", "平台 Agent 总结差距，推荐比赛、开源和实践。"],
+              ["发送材料", "让个人 Agent 先了解真实经历。"],
+              ["AI 模拟面试", "围绕目标岗位补充关键证据。"],
+              ["生成个人 Agent", "确认后，生成你的求职 Agent。"],
+              ["发布到求职广场", "自主选择想聊的岗位和活动。"],
+              ["A2A 自动沟通", "多个岗位 Agent 自动对话，提升匹配效率。"],
+              ["知乎知识与行动", "根据反馈补齐短板，安排比赛、开源和实践。"],
             ].map(([title, detail], index) => (
               <div key={title} className="rounded-2xl border border-slate-200 bg-white p-4 transition hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-sm">
                 <div className="flex items-center gap-3">
@@ -85,7 +85,7 @@ export default function Home() {
         </section>
         <section className="mx-auto w-full max-w-6xl px-4 pb-8 sm:px-6 sm:pb-10"><ZhihuHotList /></section>
       </main>
-      <footer className="border-t border-slate-200 bg-white"><div className="mx-auto max-w-6xl px-4 py-5 text-xs leading-relaxed text-slate-500 sm:px-6">三个岗位 Agent · 可追溯 Demo · 知乎实时热榜</div></footer>
+      <footer className="border-t border-slate-200 bg-white"><div className="mx-auto max-w-6xl px-4 py-5 text-xs leading-relaxed text-slate-500 sm:px-6">Agent 对话 · 能力提升 · 知乎知识与活动</div></footer>
     </div>
   );
 }
