@@ -137,6 +137,7 @@ export async function runJobConversation(input: {
   profile: CandidateProfile;
   evidencePool: Evidence[];
   baseUrl: string;
+  demoMock?: boolean;
   hooks?: DispatchHooks;
   executorFactory?: (job: JobVersion, hooks: JobExecutorHooks) => AgentExecutor;
   transportFactory?: (input: {
@@ -148,7 +149,7 @@ export async function runJobConversation(input: {
   const hooks = input.hooks ?? {};
   const executor = input.executorFactory
     ? input.executorFactory(input.job, hooks)
-    : new JobAgentExecutor(input.job, hooks);
+    : new JobAgentExecutor(input.job, hooks, { demoMock: input.demoMock });
   const transport = input.transportFactory
     ? input.transportFactory({ job: input.job, executor, baseUrl: input.baseUrl })
     : createInProcessTransport({

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { parseWorkspaceRole } from "@/lib/auth/roles";
 import {
   beginOAuth,
   cookieName,
@@ -15,7 +16,7 @@ export async function GET(request: Request) {
       { status: 503 },
     );
   }
-  const { id, url } = beginOAuth(request);
+  const { id, url } = beginOAuth(request, parseWorkspaceRole(new URL(request.url).searchParams.get("role")) ?? undefined);
   const response = NextResponse.redirect(url);
   response.cookies.set(cookieName(), id, cookieOptions());
   return response;

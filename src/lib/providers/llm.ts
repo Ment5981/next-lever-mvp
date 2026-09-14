@@ -12,8 +12,11 @@ import {
   EvidenceDraft,
   InterviewQuestionDraft,
   JobStructureDraft,
+  GrowthAnalysisDraft,
+  ResumePolishDraft,
   type CompetencyCriterion,
   type Evidence,
+  type JobAttachment,
   type JobVersion,
 } from "@/lib/schema/domain";
 import { validateWithRetry } from "@/lib/schema/validate";
@@ -21,6 +24,52 @@ import type { ProviderMode } from "@/lib/schema/enums";
 import type { ProviderCallMeta, ProviderStatus } from "./types";
 
 const AnswerSummary = z.object({ summary: z.string().min(1).max(800) });
+const GrowthCoachReply = z.object({ reply: z.string().min(1).max(1200) });
+export type GrowthCoachReply = z.infer<typeof GrowthCoachReply>;
+
+/** 归纳已完成 A2A 反馈，供进阶路径展示一段可读的分析说明。 */
+export async function analyzeGrowthFeedback(input: {
+  feedbackText: string;
+}): Promise<LlmResult<GrowthAnalysisDraft>> {
+  const prompt = [
+    "任务：分析求职者与多个岗位 Agent 已完成的对话反馈，写一段简短、客观、可执行的差距总结。",
+    "必须区分重复信号、岗位特有要求和证据不足；缺少证据只能说无法判断，不能说求职者不具备能力。",
+    "不要平均分数，不要推断整体就业市场，不要虚构比赛、链接或经历。只输出 JSON：{analysis_note:string}，控制在 400 字以内。",
+    wrapUntrusted("a2a_feedback", input.feedbackText.slice(0, 12000)),
+  ].join("\n");
+  return run<GrowthAnalysisDraft>({
+    label: "进阶路径差距分析",
+    schema: GrowthAnalysisDraft,
+    prompt,
+    fallback: () => ({
+      analysis_note: "先处理多个岗位都提到的能力，再用一个可运行作品或真实业务结果补出新证据。岗位特有要求按目标岗位分别准备；目前缺少的部分只能标记为证据不足，完成后再复评。",
+    }),
+  });
+}
+
+/** 求职者主动触发的简历润色：只优化结构和表达，不生成新事实。 */
+export async function polishResume(input: {
+  targetRole: string;
+  sourceText: string;
+}): Promise<LlmResult<ResumePolishDraft>> {
+  const prompt = [
+    "任务：根据目标岗位优化求职者简历的表达和结构。",
+    "只允许重排、压缩和改写输入中的事实；不得新增公司、项目、职责、数字、奖项、技术栈或任何未经提供的经历。",
+    "如果原文缺少结果或数字，保留信息不足，不要补写。输出 JSON：polished_text、changed_points、fact_check_note。",
+    wrapUntrusted("target_role", input.targetRole.slice(0, 120)),
+    wrapUntrusted("resume_source", input.sourceText.slice(0, 20000)),
+  ].join("\n");
+  return run<ResumePolishDraft>({
+    label: "简历润色",
+    schema: ResumePolishDraft,
+    prompt,
+    fallback: () => ({
+      polished_text: input.sourceText.trim(),
+      changed_points: ["演示模式保留原文事实", "真实模型可继续优化结构与表达"],
+      fact_check_note: "这是演示结果，未新增任何经历或指标。请逐段核对后再应用。",
+    }),
+  });
+}
 
 /**
  * LLM Provider。三种模式：
@@ -57,6 +106,31 @@ export function llmStatus(): ProviderStatus {
       ? `已配置服务端模型，model=${serverConfig.llm.model}，超时 ${serverConfig.llm.timeoutMs}ms，schema 失败最多重试 ${serverConfig.llm.maxRetries} 次`
       : "未配置 LLM_API_KEY / LLM_BASE_URL，使用确定性演示生成，所有输出标注为演示数据",
   };
+}
+
+/** 面向求职者的成长教练对话：只接收已经生成的差距摘要，不直接读取原始简历。 */
+export async function answerGrowthCoach(input: {
+  question: string;
+  context: string;
+}): Promise<LlmResult<GrowthCoachReply>> {
+  const prompt = [
+    "任务：作为求职者的成长教练，围绕已确认的岗位反馈回答一个问题。",
+    "回答要轻量、具体、可执行；不要虚构比赛、链接、岗位或用户经历。",
+    "如果信息不足，明确说信息不足，并建议下一步补什么证据。",
+    "只输出 JSON：{reply:string}。",
+    wrapUntrusted("growth_context", input.context.slice(0, 5000)),
+    wrapUntrusted("user_question", input.question.slice(0, 1000)),
+  ].join("\n");
+  return run<GrowthCoachReply>({
+    label: "成长教练对话",
+    schema: GrowthCoachReply,
+    prompt,
+    fallback: () => ({
+      reply: input.question.includes("比赛") || input.question.includes("活动")
+        ? "建议优先选择能产出公开作品或开源记录的活动，再把交付物补回 Agent 记忆。具体活动以官方页面的最新状态为准。"
+        : "先处理多个岗位重复指出的能力，再用一个真实项目补出可验证证据；完成后重新确认材料并复评。",
+    }),
+  });
 }
 
 /** 调用 OpenAI 兼容接口并返回解析后的 JSON。失败直接抛错，由上层降级。 */
@@ -160,13 +234,25 @@ async function run<T>(input: {
 export async function structureJob(input: {
   rawText: string;
   companyName: string;
+  companyProfileUrl?: string;
+  attachments?: JobAttachment[];
 }): Promise<LlmResult<JobStructureDraft>> {
+  const attachmentText =
+    input.attachments && input.attachments.length > 0
+      ? input.attachments
+          .map((file) => `- ${file.file_name}（${file.mime_type}）`)
+          .join("\n")
+      : "（未上传附件）";
   const prompt = [
     "任务：把招聘方的岗位描述结构化为岗位能力模型。",
     "输出 JSON，字段：title、summary、clarifying_questions（3-5 条，每条含 question 与 why_it_matters，只问真正影响判断的问题）、criteria（3-10 项）。",
     "criteria 每项字段：name、type（hard_requirement/core_competency/trainable/bonus）、description、weight、must_have、evidence_standard、evaluation_questions（1-5 条）。",
     "weight 为 0-100 的数字，所有 criteria 的 weight 合计必须精确等于 100。",
     `公司名称：${input.companyName}`,
+    `公司详情链接（仅作为来源记录，不要声称已读取网页内容）：${
+      input.companyProfileUrl || "（未提供）"
+    }`,
+    `岗位参考附件（文件内容需以招聘方文字描述为准）：\n${attachmentText}`,
     wrapUntrusted("job_description", input.rawText),
   ].join("\n");
 
@@ -509,6 +595,7 @@ export async function assessmentJudgment(input: {
   evidence: Evidence[];
   presetKey?: string;
   preset?: AssessmentJudgment;
+  demoMock?: boolean;
 }): Promise<LlmResult<AssessmentJudgment>> {
   const criteriaText = input.job.criteria
     .map(
@@ -521,6 +608,14 @@ export async function assessmentJudgment(input: {
   const evidenceText = input.evidence
     .map((e) => `- id=${e.evidence_id}｜等级 ${e.level}｜${e.claim}｜原文：${e.quote}`)
     .join("\n");
+
+  if (input.demoMock) {
+    const demo = input.preset ?? mockJudgment(input.job.criteria, input.evidence);
+    return {
+      data: sanitizeJudgment(demo, input.job.criteria, input.evidence),
+      meta: meta("mock", 0, false, "演示填充：使用预置评估素材，未调用外部模型"),
+    };
+  }
 
   const prompt = [
     "任务：作为招聘方 Agent，对每个能力项给出观察素材。",

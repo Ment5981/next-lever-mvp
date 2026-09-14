@@ -1,0 +1,25 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: next_level
+      POSTGRES_USER: next_level
+      POSTGRES_PASSWORD: next_level
+    ports:
+      - "5432:5432"
+    volumes:
+      - next-level-postgres:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - next-level-redis:/data
+
+volumes:
+  next-level-postgres:
+  next-level-redis:
+

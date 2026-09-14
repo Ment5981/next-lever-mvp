@@ -62,7 +62,7 @@ export function LandingActions({ initial }: { initial: WorkspaceState }) {
         <div className="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
           <span>Demo 已完成 · {result.tasks.length} 个岗位 Agent 已沟通</span>
           <Link href="/marketplace" className="font-medium underline underline-offset-2">去求职广场</Link>
-          <Link href="/candidate/workbench" className="font-medium underline underline-offset-2">看我的工作台</Link>
+          <Link href="/candidate" className="font-medium underline underline-offset-2">看我的求职空间</Link>
         </div>
       )}
       {error && <Notice tone="warn">{error}</Notice>}

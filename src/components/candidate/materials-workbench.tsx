@@ -15,6 +15,7 @@ import {
   InterviewPanel,
   type InterviewAction,
 } from "@/components/candidate/interview-panel";
+import { ResumePolisher } from "@/components/candidate/resume-polisher";
 import { callApi } from "@/lib/client/api";
 import { useWorkspace } from "@/lib/client/use-workspace";
 import type { WorkspaceState } from "@/lib/client/types";
@@ -58,8 +59,14 @@ function formatFileSize(size: number) {
     : `${(size / 1024 / 1024).toFixed(1)} MB`;
 }
 
-/** 求职者首步：准备材料，确认后进入 AI 模拟面试。 */
-export function MaterialsWorkbench({ initial }: { initial: WorkspaceState }) {
+/** 求职者材料页；interviewOnly 用于复用同一份面试状态而隐藏材料编辑区。 */
+export function MaterialsWorkbench({
+  initial,
+  interviewOnly = false,
+}: {
+  initial: WorkspaceState;
+  interviewOnly?: boolean;
+}) {
   const { state, refresh } = useWorkspace(initial);
   const [resumeText, setResumeText] = useState(initial.candidate.resume_text);
   const [projectText, setProjectText] = useState(initial.candidate.project_text);
@@ -182,14 +189,26 @@ export function MaterialsWorkbench({ initial }: { initial: WorkspaceState }) {
     );
   }
 
+  if (interviewOnly) {
+    return (
+      <InterviewPanel
+        jobs={state.jobs}
+        interview={interview}
+        targetJob={targetJob}
+        onTargetJobChange={setTargetJob}
+        onAction={runInterviewAction}
+        busy={busy}
+        blockers={interviewBlockers}
+      />
+    );
+  }
+
   return (
     <>
       <div className="mb-5 flex flex-wrap items-center gap-2 text-xs text-slate-500">
         <span className="font-medium text-indigo-700">建立 Agent</span>
         <span aria-hidden="true">→</span>
         <span className={materialsConfirmed ? "font-medium text-emerald-700" : ""}>确认材料</span>
-        <span aria-hidden="true">→</span>
-        <span className={interview?.completed ? "font-medium text-emerald-700" : ""}>AI 模拟面试</span>
         <span aria-hidden="true">→</span>
         <span>发布到广场</span>
       </div>
@@ -435,24 +454,20 @@ export function MaterialsWorkbench({ initial }: { initial: WorkspaceState }) {
         </div>
       </Panel>
 
-      <InterviewPanel
-        jobs={state.jobs}
-        interview={interview}
-        targetJob={targetJob}
-        onTargetJobChange={setTargetJob}
-        onAction={runInterviewAction}
-        busy={busy}
-        blockers={interviewBlockers}
+      <ResumePolisher
+        targetRole={state.candidate.target_role}
+        sourceText={resumeText || projectText}
+        onApply={setResumeText}
       />
 
       <Panel title="发布我的 Agent">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-slate-600">完成材料和 AI 面试后，去广场认识合适的岗位。</p>
           <Link
-            href="/candidate/workbench"
+            href="/candidate/manage#publish"
             className="inline-flex min-h-10 items-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-500"
           >
-            去发布
+            进入求职者管理
           </Link>
         </div>
       </Panel>

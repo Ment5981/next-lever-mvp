@@ -1,4 +1,5 @@
 import { fetchZhihuResources } from "@/lib/providers/zhihu";
+import { analyzeGrowthFeedback } from "@/lib/providers/llm";
 import type {
   Application,
   CriterionAssessment,
@@ -404,6 +405,17 @@ export async function buildGrowthReport(
   }
 
   const signals = buildSignals(contexts);
+  const analysis = await analyzeGrowthFeedback({
+    feedbackText: contexts
+      .map((context) => [
+        `岗位：${context.job.company_name} · ${context.job.title}`,
+        `Agent 建议：${context.assessment.suggestion_reason}`,
+        `优势：${context.assessment.strengths.join("；")}`,
+        `证据缺口：${context.assessment.evidence_gaps.join("；")}`,
+      ].join("\n"))
+      .join("\n\n")
+      .slice(0, 12000),
+  });
   const plans = planTasks(contexts);
 
   const growthTasks: GrowthTask[] = [];
@@ -481,10 +493,12 @@ export async function buildGrowthReport(
       [
         `样本仅 ${contexts.length} 个岗位，其中 ${humanConfirmed} 个有招聘方真人确认，${contexts.length - humanConfirmed} 个为招聘方 Agent 推断。`,
         `${infoInsufficient} 个岗位存在信息不足的能力项。`,
-        "本报告只反映这几个岗位按各自能力模型给出的结论，不能据此推断整体就业市场，也未对不同岗位的分数做平均。",
+      "本报告只反映这几个岗位按各自能力模型给出的结论，不能据此推断整体就业市场，也未对不同岗位的分数做平均。",
       ].join(""),
       560,
     ),
+    analysis_mode: analysis.meta.mode,
+    analysis_note: analysis.data.analysis_note,
     funnel: {
       authorized: input.authorizedCount,
       dispatched: input.applications.filter((a) =>

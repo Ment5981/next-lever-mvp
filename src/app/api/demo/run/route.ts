@@ -68,6 +68,10 @@ const DEMO_DECISIONS: Record<
  */
 export async function POST(request: Request) {
   const steps: { step: string; detail: string }[] = [];
+  const requestBody = (await request.json().catch(() => ({}))) as {
+    mode?: "mock" | "full";
+  };
+  const demoMock = requestBody.mode === "mock";
 
   // 从干净的预置状态开始，避免重复点击产生叠加的授权与任务。
   resetStore();
@@ -100,6 +104,7 @@ export async function POST(request: Request) {
 
   const dispatched = await dispatchAuthorizedApplications({
     baseUrl: baseUrlOf(request),
+    demoMock,
   });
   if (!dispatched.ok) return fail(dispatched.blockers);
   steps.push({
@@ -147,6 +152,7 @@ export async function POST(request: Request) {
     applications: listApplications(),
     authorizedCount: latestAuthorization()?.job_count ?? jobIds.length,
     userId: getCandidate().candidate_id,
+    skipZhihu: demoMock,
   });
   if (!report.ok || !report.report) return fail(report.blockers);
   const saved = saveReport(report.report);

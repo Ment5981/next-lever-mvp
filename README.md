@@ -19,6 +19,14 @@ cp .env.example .env.local   # 可选：不填任何密钥也能跑完整 Demo
 npm run dev                  # http://localhost:3000
 ```
 
+工程化本地环境可以启动 PostgreSQL 与 Redis：
+
+```bash
+docker compose up -d postgres redis
+# 在 .env.local 填 DATABASE_URL 后执行
+npm run db:migrate
+```
+
 零密钥时 LLM 走 mock，知乎知识列表接口无需鉴权仍返回真实数据，界面上所有演示内容都带「演示数据」标记。
 
 ### 配置真实大模型
@@ -53,6 +61,17 @@ LLM_MAX_RETRIES=1
 | 路径 | 内容 |
 | --- | --- |
 | `/` | 落地页 + 两个角色入口、岗位 Agent 预览、观看完整 Demo |
+| `/onboarding/role` | 选择求职者或招聘方空间，Demo 与知乎登录都从这里进入 |
+| `/app/candidate` | 求职者空间首页，统一左侧导航 |
+| `/app/candidate/explore` | 求职者职位探索：岗位、求职者 Agent、成长活动和知乎求职经验 |
+| `/app/candidate/resume` | 简历材料、证据确认和求职 Agent 生成 |
+| `/app/candidate/path` | 进阶路径、差距反馈、行动与知乎资源 |
+| `/app/candidate/applications` | 求职记录与 A2A 对话时间线 |
+| `/app/employer` | 招聘方空间首页，统一左侧导航 |
+| `/app/employer/jobs` | 岗位创建、岗位 Agent 管理与发布 |
+| `/app/employer/talent` | 招聘方候选探索，只展示求职者 Agent |
+| `/app/employer/conversations` | 招聘方查看候选人 Agent 对话 |
+| `/app/employer/reviews` | 招聘方真人决策与 Agent 建议 |
 | `/candidate` | 求职者空间：建立 Agent、发布到求职广场、进入对话 |
 | `/employer` | 招聘方空间：生成岗位 Agent、发布岗位、查看候选人对话 |
 | `/marketplace` | 求职广场：岗位与求职者 Agent 图文瀑布流、详情和 A2A 对话 |
@@ -77,7 +96,8 @@ src/lib/schema/     Zod 实体与枚举（含中文文案映射）
 src/lib/engine/     确定性逻辑：状态机、门禁、评分、评估、成长报告
 src/lib/providers/  LLM 与知乎 Provider（live / mock / fallback）
 src/lib/a2a/        协议适配、Agent Card、执行器、传输层、编排
-src/lib/store/      服务端内存单例 + 审计日志
+src/lib/store/      Demo 内存单例 + 审计日志（未配置数据库时的可逆 fallback）
+src/lib/db/         PostgreSQL/Drizzle 业务持久化模型与连接边界
 src/app/api/        Route Handlers，统一返回 {ok,data} / {ok,blockers}
 ```
 
@@ -168,8 +188,9 @@ npx vercel            # 预览
 npx vercel --prod     # 生产
 ```
 
-所有 API 路由都是 `force-dynamic`，状态存在服务端内存单例中，
-适合单实例 Demo；多实例部署需要替换为外部存储。
+所有 API 路由都是 `force-dynamic`。`src/lib/db/schema.ts` 与 Drizzle 迁移已经建立正式业务库边界；
+当前业务 Store 在未配置 `DATABASE_URL` 时使用内存 Demo，配置数据库后需要按迁移阶段把 Store 写入 repository，
+再用于多用户和多实例生产部署。
 `/api/demo/run` 设了 `maxDuration = 60`。
 
 ### GitHub Pages 演示
@@ -188,7 +209,8 @@ GitHub Pages 只能托管静态文件，因此快照中的按钮不调用服务�
 
 ## 已知限制
 
-- 服务端内存存储，重启即回到预置状态；不支持多实例横向扩展。
+- 业务 Store 当前仍保留内存 Demo fallback；PostgreSQL 表结构和迁移已准备好，业务读写迁移是下一阶段工程任务。
+- OAuth 会话当前保留内存 fallback；生产多实例应把会话与 Token 加密存储迁移到 PostgreSQL/Redis。
 - 未做 PDF 简历解析，材料以粘贴文本为主。
 - 岗位为 3 个预置案例，未接入真实外部岗位源与 ATS。
 - 语音依赖浏览器 Web Speech API，Safari 与部分移动浏览器支持有限。

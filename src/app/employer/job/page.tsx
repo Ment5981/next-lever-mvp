@@ -12,8 +12,8 @@ export default function EmployerJobPage() {
   return (
     <PageShell
       current="/employer/job"
-      title="招聘方岗位创建"
-      lead="描述岗位，确认能力模型，生成岗位 Agent。"
+      title="建立招聘 Agent"
+      lead="补充公司背景和岗位信息，生成你的招聘 Agent。"
     >
       <JobBuilder initial={workspaceSnapshot()} />
     </PageShell>

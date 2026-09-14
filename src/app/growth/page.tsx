@@ -1,5 +1,5 @@
 import { GrowthReportView } from "@/components/growth/report-view";
-import { PageShell } from "@/components/nav";
+import { CandidateWorkspaceSidebar, PageShell } from "@/components/nav";
 import { workspaceSnapshot } from "@/lib/server/snapshot";
 
 export const dynamic = "force-dynamic";
@@ -14,6 +14,7 @@ export default function GrowthPage() {
       current="/growth"
       title="成长报告"
       lead="聚合三个岗位的反馈，生成可执行成长任务。"
+      sidebar={<CandidateWorkspaceSidebar current="/growth" activeHref="/growth" />}
     >
       <GrowthReportView initial={workspaceSnapshot()} />
     </PageShell>

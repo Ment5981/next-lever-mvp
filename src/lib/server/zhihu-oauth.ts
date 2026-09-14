@@ -1,5 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { ZHIHU_ENDPOINTS, serverConfig } from "@/lib/config";
+import type { WorkspaceRole } from "@/lib/auth/roles";
 
 export type ZhihuUserProfile = {
   uid: string;
@@ -17,6 +18,8 @@ type ZhihuSession = {
   accessToken?: string;
   accessTokenExpiresAt?: number;
   profile?: ZhihuUserProfile;
+  userId?: string;
+  intendedRole?: WorkspaceRole;
   createdAt: number;
 };
 
@@ -86,11 +89,12 @@ export function redirectUri(request: Request) {
   );
 }
 
-export function beginOAuth(request: Request) {
+export function beginOAuth(request: Request, intendedRole?: WorkspaceRole) {
   const { id, session } = getOrCreateSession(request);
   const state = randomBytes(32).toString("hex");
   session.state = state;
   session.stateExpiresAt = Date.now() + STATE_TTL_MS;
+  session.intendedRole = intendedRole;
   const url = new URL(ZHIHU_ENDPOINTS.oauthAuthorize);
   url.searchParams.set("redirect_uri", redirectUri(request));
   url.searchParams.set("app_id", serverConfig.zhihu.oauthAppId);

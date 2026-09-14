@@ -67,14 +67,14 @@ export function HomeConsole({ initial }: { initial: WorkspaceState }) {
       >
         <div className="grid gap-3 sm:grid-cols-2">
           <Link
-            href="/candidate/materials"
+            href="/candidate"
             className="group flex min-h-16 items-center justify-between rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 transition-all hover:-translate-y-0.5 hover:border-indigo-400 hover:bg-indigo-100 active:scale-[0.99]"
           >
             <p className="font-medium text-indigo-950">求职者登录</p>
             <span className="text-lg text-indigo-500 transition-transform group-hover:translate-x-1">→</span>
           </Link>
           <Link
-            href="/employer/job"
+            href="/employer"
             className="group flex min-h-16 items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 transition-all hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-50/50 active:scale-[0.99]"
           >
             <p className="font-medium text-slate-900">招聘方登录</p>
@@ -131,7 +131,7 @@ export function HomeConsole({ initial }: { initial: WorkspaceState }) {
 
           {!run && reportReady && (
             <Notice tone="good">
-              工作台已有成长报告，可直接查看
+              已有成长报告，可直接查看
               <Link className="mx-1 underline" href="/growth">
                 成长报告
               </Link>
@@ -155,7 +155,7 @@ export function HomeConsole({ initial }: { initial: WorkspaceState }) {
                 href="/employer/inbox"
                 className="text-sm text-indigo-700 underline underline-offset-2"
               >
-                查看招聘方工作台
+                查看候选人
               </Link>
               <Link
                 href="/growth"

@@ -32,6 +32,37 @@ body {
   overflow-x: hidden;
 }
 
+/* Tailwind v4 may omit responsive display utilities when they are composed
+ * inside shared navigation components. Keep the workspace shell deterministic. */
+.candidate-workspace-desktop-sidebar {
+  display: none;
+}
+
+.candidate-workspace-mobile-nav {
+  display: block;
+}
+
+.candidate-workspace-nav-list {
+  display: flex;
+  width: max-content;
+  gap: 0.25rem;
+}
+
+@media (min-width: 64rem) {
+  .candidate-workspace-desktop-sidebar {
+    display: block;
+  }
+
+  .candidate-workspace-mobile-nav {
+    display: none;
+  }
+
+  .candidate-workspace-nav-list {
+    display: block;
+    width: auto;
+  }
+}
+
 ::selection {
   background: #c7d2fe;
   color: #1e1b4b;

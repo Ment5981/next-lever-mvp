@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/button";
 import { VoiceInput } from "@/components/voice-input";
 import { Badge, Blockers, Notice, Panel, type Tone } from "@/components/ui";
@@ -10,12 +10,19 @@ import { useWorkspace } from "@/lib/client/use-workspace";
 import type { WorkspaceState } from "@/lib/client/types";
 import { validateWeights } from "@/lib/engine/scoring";
 import { CRITERION_TYPE_TEXT, type CriterionType } from "@/lib/schema/enums";
-import type { ClarifyingQuestion, CompetencyCriterion, JobVersion } from "@/lib/schema/domain";
+import type {
+  ClarifyingQuestion,
+  CompetencyCriterion,
+  JobAttachment,
+  JobVersion,
+} from "@/lib/schema/domain";
 import type { ProviderCallMeta } from "@/lib/providers/types";
 
 type JobDraft = {
   job_id: string;
   company_name: string;
+  company_profile_url: string;
+  attachments: JobAttachment[];
   title: string;
   summary: string;
   raw_input: string;
@@ -25,6 +32,24 @@ type JobDraft = {
   clarifications: ClarifyingQuestion[];
   criteria: CompetencyCriterion[];
 };
+
+type JobAttachmentPreview = JobAttachment & {
+  id: string;
+  preview_url: string;
+};
+
+let localAttachmentSequence = 0;
+
+function attachmentId() {
+  localAttachmentSequence += 1;
+  return `job_file_local_${localAttachmentSequence}`;
+}
+
+function formatFileSize(size: number) {
+  return size < 1024 * 1024
+    ? `${Math.max(1, Math.round(size / 1024))} KB`
+    : `${(size / 1024 / 1024).toFixed(1)} MB`;
+}
 
 const CRITERION_TYPES = Object.keys(CRITERION_TYPE_TEXT) as CriterionType[];
 
@@ -37,14 +62,61 @@ const MODE_TONE: Record<ProviderCallMeta["mode"], Tone> = {
 export function JobBuilder({ initial }: { initial: WorkspaceState }) {
   const { state, refresh } = useWorkspace(initial);
   const [companyName, setCompanyName] = useState("");
+  const [companyProfileUrl, setCompanyProfileUrl] = useState("");
   const [rawText, setRawText] = useState("");
   const [inputMode, setInputMode] = useState<"text" | "voice">("text");
   const [transcriptConfirmed, setTranscriptConfirmed] = useState(false);
+  const [attachments, setAttachments] = useState<JobAttachmentPreview[]>([]);
   const [draft, setDraft] = useState<JobDraft | null>(null);
   const [providerMeta, setProviderMeta] = useState<ProviderCallMeta | null>(null);
   const [confirmed, setConfirmed] = useState<JobVersion | null>(null);
   const [blockers, setBlockers] = useState<string[]>([]);
-  const [busy, setBusy] = useState<"draft" | "confirm" | null>(null);
+  const [notice, setNotice] = useState("");
+  const [busy, setBusy] = useState<"draft" | "confirm" | "publish" | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const attachmentsRef = useRef<JobAttachmentPreview[]>([]);
+
+  useEffect(() => {
+    attachmentsRef.current = attachments;
+  }, [attachments]);
+
+  useEffect(
+    () => () => {
+      attachmentsRef.current.forEach((item) => URL.revokeObjectURL(item.preview_url));
+    },
+    [],
+  );
+
+  function addFiles(fileList: FileList | null) {
+    if (!fileList) return;
+    const available = Math.max(0, 6 - attachments.length);
+    const next = Array.from(fileList)
+      .filter(
+        (file) =>
+          (file.type === "application/pdf" || file.type.startsWith("image/")) &&
+          file.size <= 20 * 1024 * 1024,
+      )
+      .slice(0, available)
+      .map((file) => ({
+        id: attachmentId(),
+        file_name: file.name,
+        mime_type: file.type,
+        size_bytes: file.size,
+        preview_url: URL.createObjectURL(file),
+      }));
+    setAttachments((prev) => [...prev, ...next]);
+    if (fileList.length !== next.length) {
+      setNotice("仅支持 PDF 或图片，单个文件不超过 20 MB，最多 6 份。 ");
+    }
+  }
+
+  function removeAttachment(id: string) {
+    setAttachments((prev) => {
+      const item = prev.find((entry) => entry.id === id);
+      if (item) URL.revokeObjectURL(item.preview_url);
+      return prev.filter((entry) => entry.id !== id);
+    });
+  }
 
   const weights = draft
     ? validateWeights(draft.criteria)
@@ -53,10 +125,17 @@ export function JobBuilder({ initial }: { initial: WorkspaceState }) {
   async function generateDraft() {
     setBusy("draft");
     setConfirmed(null);
+    setNotice("");
     const result = await callApi<{ draft: JobDraft; provider: ProviderCallMeta }>(
       "/api/employer/job/draft",
       {
         company_name: companyName,
+        company_profile_url: companyProfileUrl,
+        attachments: attachments.map((file) => ({
+          file_name: file.file_name,
+          mime_type: file.mime_type,
+          size_bytes: file.size_bytes,
+        })),
         raw_text: rawText,
         input_mode: inputMode,
         transcript_confirmed: transcriptConfirmed,
@@ -117,6 +196,8 @@ export function JobBuilder({ initial }: { initial: WorkspaceState }) {
       {
         job_id: draft.job_id,
         company_name: draft.company_name,
+        company_profile_url: draft.company_profile_url,
+        attachments: draft.attachments,
         title: draft.title,
         raw_input: draft.raw_input,
         input_mode: draft.input_mode,
@@ -131,6 +212,27 @@ export function JobBuilder({ initial }: { initial: WorkspaceState }) {
       setConfirmed(result.data.job);
       setBlockers([]);
       setDraft(null);
+      await refresh();
+    } else {
+      setBlockers(result.blockers);
+    }
+    setBusy(null);
+  }
+
+  async function publishJob() {
+    if (!confirmed) return;
+    setBusy("publish");
+    const result = await callApi<{ job: JobVersion }>(
+      "/api/employer/job/publish",
+      {
+        job_version_id: confirmed.job_version_id,
+        published: !confirmed.published,
+      },
+    );
+    if (result.ok) {
+      setConfirmed(result.data.job);
+      setBlockers([]);
+      setNotice(result.data.job.published ? "岗位 Agent 已发布到求职广场。" : "岗位 Agent 已从求职广场撤下。");
       await refresh();
     } else {
       setBlockers(result.blockers);
@@ -169,6 +271,20 @@ export function JobBuilder({ initial }: { initial: WorkspaceState }) {
                 className="mt-1 w-full rounded-xl border border-slate-300 p-2.5 text-sm"
               />
             </label>
+            <label className="block">
+              <span className="text-sm text-slate-700">公司详情链接（可选）</span>
+              <input
+                type="url"
+                value={companyProfileUrl}
+                onChange={(event) => setCompanyProfileUrl(event.target.value)}
+                placeholder="https://example.com/about"
+                className="mt-1 w-full rounded-xl border border-slate-300 p-2.5 text-sm"
+              />
+              <span className="mt-1 block text-xs text-slate-400">用于记录公司背景来源，不会自动抓取网页。</span>
+            </label>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
             <div className="flex items-end gap-2">
               <Badge tone={inputMode === "voice" ? "info" : "neutral"}>
                 当前输入方式：{inputMode === "voice" ? "语音转写" : "文字"}
@@ -179,6 +295,60 @@ export function JobBuilder({ initial }: { initial: WorkspaceState }) {
                 </Badge>
               )}
             </div>
+          </div>
+
+          <div className="rounded-2xl border border-dashed border-indigo-300 bg-indigo-50/50 p-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-semibold text-slate-900">岗位参考材料</p>
+                <p className="mt-1 text-xs text-slate-500">上传岗位说明、团队介绍或业务资料，支持 PDF、JPG、PNG，立即预览。</p>
+              </div>
+              <Button variant="secondary" onClick={() => inputRef.current?.click()} className="w-full sm:w-auto">
+                添加文件
+              </Button>
+              <input
+                ref={inputRef}
+                id="employer-job-attachment"
+                type="file"
+                accept="application/pdf,image/*"
+                multiple
+                className="sr-only"
+                onChange={(event) => {
+                  addFiles(event.target.files);
+                  event.currentTarget.value = "";
+                }}
+              />
+            </div>
+
+            {attachments.length > 0 && (
+              <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {attachments.map((file) => (
+                  <div key={file.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                    <div className="relative h-32 bg-slate-50">
+                      {file.mime_type === "application/pdf" ? (
+                        <iframe title={file.file_name} src={file.preview_url} className="size-full border-0" />
+                      ) : (
+                        // Blob URLs are created in the browser and cannot use the Next image optimizer.
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={file.preview_url} alt={file.file_name} className="size-full object-contain" />
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => removeAttachment(file.id)}
+                        aria-label={`移除 ${file.file_name}`}
+                        className="absolute top-2 right-2 grid size-7 place-items-center rounded-full bg-slate-900/70 text-sm text-white hover:bg-slate-900"
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <div className="flex items-center justify-between gap-2 p-3 text-xs">
+                      <span className="truncate font-medium text-slate-700">{file.file_name}</span>
+                      <span className="shrink-0 text-slate-400">{formatFileSize(file.size_bytes)}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <label className="block">
@@ -209,6 +379,7 @@ export function JobBuilder({ initial }: { initial: WorkspaceState }) {
           />
 
           <Blockers items={blockers} />
+          {notice && <Notice tone="info">{notice}</Notice>}
 
           <div className="flex flex-wrap items-center gap-3">
             <Button
@@ -441,6 +612,9 @@ export function JobBuilder({ initial }: { initial: WorkspaceState }) {
               <Badge tone="accent">
                 招聘方 Agent Card 已就绪
               </Badge>
+              <Badge tone={confirmed.published ? "good" : "warn"}>
+                {confirmed.published ? "已发布" : "未发布"}
+              </Badge>
             </div>
             <p className="text-sm leading-relaxed break-words text-slate-700">
               {confirmed.company_name} · {confirmed.title}
@@ -456,6 +630,12 @@ export function JobBuilder({ initial }: { initial: WorkspaceState }) {
               </Link>
               查看。
             </Notice>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button onClick={publishJob} busy={busy === "publish"}>
+                {confirmed.published ? "撤下岗位" : "发布到求职广场"}
+              </Button>
+              {notice && <Notice tone="good">{notice}</Notice>}
+            </div>
           </div>
         </Panel>
       )}

@@ -25,7 +25,7 @@ export function WorkbenchHub({ role, initial }: { role: Role; initial: Workspace
         <Stat label="A2A Task" value={initial.tasks.length} />
         <Stat label={role === "candidate" ? "成长报告" : "真人决策"} value={role === "candidate" ? initial.reports.length : initial.decisions.length} />
       </div>
-      <Panel title="工作台" subtitle="需要细看时，再打开对应模块。">
+      <Panel title={role === "candidate" ? "求职者管理" : "招聘方管理"} subtitle="需要调整或查看时，再打开对应模块。">
         <div className="grid gap-3 sm:grid-cols-2">
           {cards.map((card) => (
             <Link key={card.href} href={card.href} className="group flex items-center justify-between rounded-2xl border border-slate-200 p-4 transition hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-50 hover:shadow-sm">

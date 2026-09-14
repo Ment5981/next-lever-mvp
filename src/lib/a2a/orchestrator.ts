@@ -40,10 +40,34 @@ export type DispatchOutcome = {
   assessments: JobAssessment[];
 };
 
+let activeDispatch: Promise<DispatchOutcome> | null = null;
+
+export function isA2ADispatchRunning(): boolean {
+  return activeDispatch !== null;
+}
+
+/** 启动后台 A2A 编排，让前端可以通过快照观察消息和状态逐步落库。 */
+export function beginA2ADispatch(input?: {
+  baseUrl?: string;
+  evidencePool?: Evidence[];
+  demoMock?: boolean;
+  jobVersionId?: string;
+}): boolean {
+  if (activeDispatch) return false;
+  activeDispatch = dispatchAuthorizedApplications(input)
+    .catch((error) => ({ ok: false, blockers: [error instanceof Error ? error.message : "A2A 编排失败"], results: [], assessments: [] }))
+    .finally(() => {
+      activeDispatch = null;
+    });
+  return true;
+}
+
 /** 一次性把已授权批次里的全部申请投递出去。 */
 export async function dispatchAuthorizedApplications(input?: {
   baseUrl?: string;
   evidencePool?: Evidence[];
+  demoMock?: boolean;
+  jobVersionId?: string;
 }): Promise<DispatchOutcome> {
   const baseUrl = input?.baseUrl ?? "http://localhost:3000";
   const agent = getCandidateAgent();
@@ -71,7 +95,10 @@ export async function dispatchAuthorizedApplications(input?: {
     input?.evidencePool ?? demoEvidencePool(auth.disclosure_snapshot);
 
   const pending = listApplications().filter(
-    (a) => a.candidate_agent_id === agent.candidate_agent_id && a.state === "authorized",
+    (a) =>
+      a.candidate_agent_id === agent.candidate_agent_id &&
+      a.state === "authorized" &&
+      (!input?.jobVersionId || a.job_version_id === input.jobVersionId),
   );
   if (pending.length === 0) {
     return {
@@ -95,6 +122,10 @@ export async function dispatchAuthorizedApplications(input?: {
     const job = findJob(application.job_version_id);
     if (!job) {
       blockers.push(`岗位不存在：${application.job_version_id}`);
+      continue;
+    }
+    if (job.hiring_status === "filled") {
+      blockers.push(`${job.job_version_id}: 岗位已招满，暂停新的 A2A 对话`);
       continue;
     }
 
@@ -124,6 +155,7 @@ export async function dispatchAuthorizedApplications(input?: {
       profile,
       evidencePool,
       baseUrl,
+      demoMock: input?.demoMock,
       hooks: {
         onTaskCreated: (task) => {
           taskIdForRecord = task.id;

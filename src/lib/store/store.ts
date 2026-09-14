@@ -16,6 +16,8 @@ import type {
   ApplicationBatch,
   AuthorizationRecord,
   CandidateAgent,
+  CandidateAgentSettings,
+  CandidateMarketplacePost,
   CandidateProfile,
   DisclosureScope,
   EmployerDecision,
@@ -33,6 +35,7 @@ import type { ApplicationState } from "@/lib/schema/enums";
  */
 export type StoreState = {
   jobs: JobVersion[];
+  candidateMarketplacePosts: CandidateMarketplacePost[];
   candidate: CandidateProfile;
   interview: InterviewSession;
   disclosure: DisclosureScope;
@@ -56,6 +59,7 @@ function clone<T>(value: T): T {
 function initialState(): StoreState {
   return {
     jobs: clone(PRESET_JOB_VERSIONS),
+    candidateMarketplacePosts: [],
     candidate: clone(PRESET_CANDIDATE),
     interview: clone(PRESET_INTERVIEW),
     disclosure: defaultDisclosure(),
@@ -126,6 +130,51 @@ export function appendJobVersion(job: JobVersion): JobVersion {
   return stored;
 }
 
+/** 发布或下架岗位 Agent，不改写岗位内容与版本号。 */
+export function setJobPublished(jobVersionId: string, published: boolean): JobVersion | null {
+  const state = stateRef();
+  const index = state.jobs.findIndex((job) => job.job_version_id === jobVersionId);
+  if (index < 0) return null;
+  state.jobs[index] = { ...state.jobs[index], published };
+  audit("job_publication_changed", `${jobVersionId} ${published ? "发布到" : "从"}求职广场`);
+  return state.jobs[index];
+}
+
+/** 修改岗位招聘状态。已招满只影响新对话入口，不删除历史记录。 */
+export function setJobHiringStatus(
+  jobVersionId: string,
+  hiring_status: "hiring" | "filled",
+): JobVersion | null {
+  const state = stateRef();
+  const index = state.jobs.findIndex((job) => job.job_version_id === jobVersionId);
+  if (index < 0) return null;
+  state.jobs[index] = { ...state.jobs[index], hiring_status };
+  audit("job_hiring_status_changed", `${jobVersionId} 状态改为 ${hiring_status}`);
+  return state.jobs[index];
+}
+
+/* --------------------------- 求职广场发布 --------------------------- */
+
+export function listCandidateMarketplacePosts(): CandidateMarketplacePost[] {
+  return stateRef().candidateMarketplacePosts.filter((post) => post.published);
+}
+
+export function publishCandidateMarketplacePost(
+  post: CandidateMarketplacePost,
+): CandidateMarketplacePost {
+  const state = stateRef();
+  const existingIndex = state.candidateMarketplacePosts.findIndex(
+    (item) => item.candidate_id === post.candidate_id,
+  );
+  if (existingIndex >= 0) {
+    state.candidateMarketplacePosts[existingIndex] = post;
+  } else {
+    state.candidateMarketplacePosts.push(post);
+  }
+  audit("candidate_marketplace_post_published", `${post.candidate_id} 发布求职卡 ${post.post_id}`);
+  return post;
+}
+
 /* ------------------------------- 求职者材料 ------------------------------- */
 
 export function getCandidate(): CandidateProfile {
@@ -193,11 +242,30 @@ export function publishCandidateAgent(): {
     disclosure: clone(state.disclosure),
     disclosure_confirmed: true,
     agent_card_name: `${state.candidate.display_name} · 求职者 Agent`,
+    personality: {
+      tone: "structured",
+      traits: ["基于事实", "具体回答", "谨慎披露"],
+    },
+    memory_policy: "confirmed_only",
     created_at: nowIso(),
   };
   state.candidateAgent = agent;
   audit("candidate_agent_published", `${agent.candidate_agent_id} 生成，材料版本 ${agent.material_version}`);
   return { ok: true, blockers: [], agent };
+}
+
+/** 编辑 Agent 的可变配置；材料与披露内容仍需从对应页面重新确认。 */
+export function updateCandidateAgentSettings(
+  settings: CandidateAgentSettings,
+): CandidateAgent | null {
+  const state = stateRef();
+  if (!state.candidateAgent) return null;
+  state.candidateAgent = {
+    ...state.candidateAgent,
+    ...settings,
+  };
+  audit("candidate_agent_settings_updated", `更新 Agent 配置：${settings.agent_card_name}`);
+  return state.candidateAgent;
 }
 
 /* -------------------------------- 授权 -------------------------------- */
@@ -294,6 +362,33 @@ export function createApplications(authorizationId: string): {
   state.batches.push(batch);
   audit("applications_created", `批次 ${batchId} 创建 ${applications.length} 份申请，全部处于 authorized`);
   return { ok: true, blockers: [], batch };
+}
+
+/** 在既有一次性授权范围内重新开启单个岗位对话，不扩大授权范围。 */
+export function createConversationApplication(
+  authorizationId: string,
+  jobVersionId: string,
+): { ok: boolean; blockers: string[]; application: Application | null } {
+  const state = stateRef();
+  const auth = state.authorizations.find((item) => item.authorization_id === authorizationId);
+  if (!auth) return { ok: false, blockers: ["未找到授权记录，不能开启 A2A 对话"], application: null };
+  if (!auth.job_version_ids.includes(jobVersionId)) {
+    return { ok: false, blockers: ["该岗位不在已授权范围内，不能静默新增岗位"], application: null };
+  }
+  const at = nowIso();
+  const application: Application = {
+    application_id: makeId("app"),
+    batch_id: makeId("chat_batch"),
+    candidate_agent_id: auth.candidate_agent_id,
+    job_version_id: jobVersionId,
+    state: "authorized",
+    task_id: null,
+    created_at: at,
+    updated_at: at,
+  };
+  state.applications.push(application);
+  audit("conversation_application_created", `在已授权岗位 ${jobVersionId} 开启一轮新的 A2A 对话`);
+  return { ok: true, blockers: [], application };
 }
 
 /** 状态推进只允许经过状态机。 */

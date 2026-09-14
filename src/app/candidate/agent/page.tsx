@@ -7,5 +7,5 @@ export const metadata = {
 };
 
 export default function CandidateAgentPage() {
-  redirect("/candidate/workbench");
+  redirect("/candidate/manage");
 }

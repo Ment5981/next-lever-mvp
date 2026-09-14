@@ -9,11 +9,15 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "pages:export": "node scripts/export-github-pages.mjs"
+    "pages:export": "node scripts/export-github-pages.mjs",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
     "@a2a-js/sdk": "^1.1.0",
+    "drizzle-orm": "^0.45.2",
     "next": "16.3.5",
+    "pg": "^8.23.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "zod": "^4.6.4",
@@ -22,8 +26,10 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^24.13.4",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.3.5",
     "tailwindcss": "^4",

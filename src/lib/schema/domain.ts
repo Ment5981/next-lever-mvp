@@ -37,12 +37,24 @@ export const ClarifyingQuestion = z.object({
 });
 export type ClarifyingQuestion = z.infer<typeof ClarifyingQuestion>;
 
+/** 招聘方岗位参考附件。MVP 只保存元数据，文件内容留在浏览器本地预览。 */
+export const JobAttachment = z.object({
+  file_name: z.string().min(1).max(180),
+  mime_type: z.string().min(1).max(120),
+  size_bytes: z.number().int().nonnegative().max(20 * 1024 * 1024),
+});
+export type JobAttachment = z.infer<typeof JobAttachment>;
+
 /** 岗位版本。确认后不可静默覆盖，只能追加新版本。 */
 export const JobVersion = z.object({
   job_version_id: Id,
   job_id: Id,
   version: z.number().int().positive(),
   company_name: z.string().min(1).max(80),
+  company_profile_url: z.string().url().max(500).or(z.literal("")).default(""),
+  attachments: z.array(JobAttachment).max(6).default([]),
+  published: z.boolean().default(false),
+  hiring_status: z.enum(["hiring", "filled"]).default("hiring"),
   title: z.string().min(1).max(80),
   raw_input: z.string().max(8000),
   input_mode: z.enum(["text", "voice"]),
@@ -104,6 +116,14 @@ export const EvidenceDraft = z.object({
 });
 export type EvidenceDraft = z.infer<typeof EvidenceDraft>;
 
+/** 简历润色结果。只允许重组已提供事实，不允许补写经历或指标。 */
+export const ResumePolishDraft = z.object({
+  polished_text: z.string().min(1).max(20000),
+  changed_points: z.array(z.string().min(1).max(160)).max(5).default([]),
+  fact_check_note: z.string().min(1).max(300),
+});
+export type ResumePolishDraft = z.infer<typeof ResumePolishDraft>;
+
 export const PortfolioItem = z.object({
   item_id: Id,
   title: z.string().min(1).max(120),
@@ -162,6 +182,27 @@ export const CandidateProfile = z.object({
 });
 export type CandidateProfile = z.infer<typeof CandidateProfile>;
 
+/** 求职者发布到求职广场的公开求职卡。只保存用户主动填写的公开字段。 */
+export const CandidateMarketplacePost = z.object({
+  post_id: Id,
+  candidate_id: Id,
+  display_name: z.string().min(1).max(40),
+  role: z.string().min(1).max(80),
+  image_url: z.string().max(500).default(""),
+  location: z.string().max(80).default(""),
+  experience: z.string().max(80).default(""),
+  education: z.string().max(120).default(""),
+  intro: z.string().min(1).max(800),
+  tags: z.array(z.string().min(1).max(30)).max(10).default([]),
+  projects: z.array(z.string().min(1).max(400)).max(8).default([]),
+  resume: z.array(z.string().min(1).max(300)).max(8).default([]),
+  availability: z.string().max(80).default(""),
+  published: z.boolean().default(true),
+  created_at: Timestamp,
+  updated_at: Timestamp,
+});
+export type CandidateMarketplacePost = z.infer<typeof CandidateMarketplacePost>;
+
 /** 披露范围。字段级，由用户逐项确认。 */
 export const DisclosureScope = z.object({
   share_display_name: z.boolean().default(true),
@@ -172,6 +213,19 @@ export const DisclosureScope = z.object({
 });
 export type DisclosureScope = z.infer<typeof DisclosureScope>;
 
+export const AgentPersonality = z.object({
+  tone: z.enum(["structured", "warm", "concise"]).default("structured"),
+  traits: z.array(z.string().min(1).max(30)).max(5).default(["基于事实", "具体回答", "谨慎披露"]),
+});
+export type AgentPersonality = z.infer<typeof AgentPersonality>;
+
+export const CandidateAgentSettings = z.object({
+  agent_card_name: z.string().min(1).max(80),
+  personality: AgentPersonality,
+  memory_policy: z.literal("confirmed_only").default("confirmed_only"),
+});
+export type CandidateAgentSettings = z.infer<typeof CandidateAgentSettings>;
+
 /** 可投递的求职者 Agent。只有确认材料+面试+披露范围后才能生成。 */
 export const CandidateAgent = z.object({
   candidate_agent_id: Id,
@@ -180,6 +234,11 @@ export const CandidateAgent = z.object({
   disclosure: DisclosureScope,
   disclosure_confirmed: z.boolean().default(false),
   agent_card_name: z.string().min(1),
+  personality: AgentPersonality.default({
+    tone: "structured",
+    traits: ["基于事实", "具体回答", "谨慎披露"],
+  }),
+  memory_policy: z.literal("confirmed_only").default("confirmed_only"),
   created_at: Timestamp,
 });
 export type CandidateAgent = z.infer<typeof CandidateAgent>;
@@ -390,6 +449,12 @@ export const GrowthTask = z.object({
 });
 export type GrowthTask = z.infer<typeof GrowthTask>;
 
+/** 大模型对多岗位反馈的轻量归纳，只作为报告解释层，不改写确定性评估。 */
+export const GrowthAnalysisDraft = z.object({
+  analysis_note: z.string().min(1).max(1000),
+});
+export type GrowthAnalysisDraft = z.infer<typeof GrowthAnalysisDraft>;
+
 export const FeedbackSignal = z.object({
   signal_id: Id,
   category: FeedbackCategory,
@@ -417,6 +482,8 @@ export const GrowthReport = z.object({
   feedback_sources: z.array(z.string().min(1)).default([]),
   overall_confidence: z.number().min(0).max(1),
   confidence_note: z.string().min(1).max(600),
+  analysis_mode: z.enum(["live", "mock", "fallback"]).default("mock"),
+  analysis_note: z.string().min(1).max(1000).default("等待生成差距分析。"),
   funnel: z.object({
     authorized: z.number().int().min(0),
     dispatched: z.number().int().min(0),

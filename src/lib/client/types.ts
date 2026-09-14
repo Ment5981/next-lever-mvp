@@ -3,6 +3,7 @@ import type {
   A2ATaskRecord,
   AuthorizationRecord,
   CandidateAgent,
+  CandidateMarketplacePost,
   CandidateProfile,
   DisclosureScope,
   EmployerDecision,
@@ -29,6 +30,7 @@ export type ZhihuCounters = {
 export type WorkspaceState = {
   schema_version: string;
   jobs: JobVersion[];
+  candidate_marketplace_posts: CandidateMarketplacePost[];
   job_match_reasons: Record<string, string>;
   candidate: CandidateProfile;
   interview: InterviewSession;
@@ -45,7 +47,9 @@ export type WorkspaceState = {
   audit_log: { at: string; action: string; detail: string }[];
   providers: ProviderStatus[];
   a2a: { transport: string; protocol_version: string; compat_note: string };
+  a2a_running: boolean;
   zhihu_counters: ZhihuCounters;
+  persistence: { mode: "postgres" | "memory-demo"; configured: boolean };
 };
 
 export type ApiResult<T> =

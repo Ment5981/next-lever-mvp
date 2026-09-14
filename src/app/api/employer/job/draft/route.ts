@@ -7,6 +7,17 @@ export const dynamic = "force-dynamic";
 
 const Payload = z.object({
   company_name: z.string().min(1).max(80),
+  company_profile_url: z.string().url().max(500).or(z.literal("")).default(""),
+  attachments: z
+    .array(
+      z.object({
+        file_name: z.string().min(1).max(180),
+        mime_type: z.string().min(1).max(120),
+        size_bytes: z.number().int().nonnegative().max(20 * 1024 * 1024),
+      }),
+    )
+    .max(6)
+    .default([]),
   raw_text: z.string().min(10).max(8000),
   input_mode: z.enum(["text", "voice"]).default("text"),
   /** 语音输入必须先确认转写，未确认不能进入岗位模型。 */
@@ -32,6 +43,8 @@ export async function POST(request: Request) {
   const result = await structureJob({
     rawText,
     companyName: body.company_name,
+    companyProfileUrl: body.company_profile_url,
+    attachments: body.attachments,
   });
 
   const jobId = makeId("job");
@@ -39,6 +52,8 @@ export async function POST(request: Request) {
     draft: {
       job_id: jobId,
       company_name: body.company_name,
+      company_profile_url: body.company_profile_url,
+      attachments: body.attachments,
       title: result.data.title,
       summary: result.data.summary,
       raw_input: rawText,

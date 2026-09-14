@@ -12,6 +12,10 @@ export const PRESET_JOB_VERSIONS: JobVersion[] = [
     job_id: "job_a",
     version: 1,
     company_name: "启明智研",
+    company_profile_url: "",
+    attachments: [],
+    published: true,
+    hiring_status: "hiring",
     title: "初级 AI 应用产品经理（用户研究与产品闭环）",
     raw_input:
       "我们在做面向 C 端的 AI 学习助手，需要一个能自己跑用户访谈、把问题拆成需求、再跟进上线和数据复盘的产品新人。不要求带团队，但要能独立完成一个小闭环。",
@@ -118,6 +122,10 @@ export const PRESET_JOB_VERSIONS: JobVersion[] = [
     job_id: "job_b",
     version: 1,
     company_name: "远景数科",
+    company_profile_url: "",
+    attachments: [],
+    published: true,
+    hiring_status: "hiring",
     title: "初级 AI 应用产品经理（企业客户交付）",
     raw_input:
       "我们做 B 端 AI 客服与知识库交付，需要产品同学能进客户现场、把客户流程拆清楚、推动交付上线，并且用业务指标证明价值。客户方一般是运营总监级别。",
@@ -223,6 +231,10 @@ export const PRESET_JOB_VERSIONS: JobVersion[] = [
     job_id: "job_c",
     version: 1,
     company_name: "拾光实验室",
+    company_profile_url: "",
+    attachments: [],
+    published: true,
+    hiring_status: "hiring",
     title: "初级 AI 应用产品经理（技术理解与可运行作品）",
     raw_input:
       "我们是十来个人的 AI 工具团队，产品同学要能自己搭原型、看懂 prompt 与评测结果、和算法同学讨论实现方案。最好有能跑起来的作品。",

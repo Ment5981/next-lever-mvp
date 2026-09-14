@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { HomePreview } from "@/components/home-preview";
-import { LandingActions } from "@/components/landing-actions";
 import { Nav } from "@/components/nav";
 import { workspaceSnapshot } from "@/lib/server/snapshot";
 import { ZhihuHotList } from "@/components/zhihu-hot-list";
@@ -14,19 +13,17 @@ export default function Home() {
     <div className="flex min-h-full flex-col bg-slate-50">
       <Nav />
       <main className="flex-1">
-        <section className="stage-grid overflow-hidden border-b border-slate-200 bg-white">
-          <div className="mx-auto grid max-w-6xl gap-9 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-16">
+        <section className="stage-grid relative overflow-hidden border-b border-slate-200 bg-white">
+          <div className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-30" style={{ backgroundImage: "url('/next-level-cover.png')" }} />
+          <div className="pointer-events-none absolute inset-0 bg-white/65" />
+          <div className="relative mx-auto grid max-w-6xl gap-9 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-16">
             <div>
               <p className="text-xs font-semibold tracking-[0.18em] text-indigo-600 uppercase">AI AGENT × JOB GROWTH</p>
               <h1 className="mt-4 text-5xl leading-[0.98] font-semibold tracking-[-0.05em] text-slate-950 sm:text-7xl">Next Level</h1>
-              <p className="mt-5 max-w-xl text-xl leading-9 text-slate-700 sm:text-2xl">让 Agent 先聊清岗位，再帮你补齐能力。</p>
-              <p className="mt-3 max-w-lg text-sm leading-7 text-slate-500">求职者 Agent 与招聘者 Agent 在广场中自动对话，每一次反馈都变成下一次行动。</p>
-              <div className="mt-7 grid max-w-lg grid-cols-2 gap-2">
-                <Link href="/candidate" className="group flex min-h-14 items-center justify-between rounded-2xl bg-indigo-600 px-4 text-sm font-semibold text-white shadow-lg shadow-indigo-200 transition hover:-translate-y-0.5 hover:bg-indigo-500">我是求职者 <span className="text-lg transition-transform group-hover:translate-x-1">→</span></Link>
-                <Link href="/employer" className="group flex min-h-14 items-center justify-between rounded-2xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-900 transition hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-50">我是招聘方 <span className="text-lg text-slate-400 transition-transform group-hover:translate-x-1">→</span></Link>
-              </div>
-              <Link href="/marketplace" className="group mt-3 flex max-w-lg items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#ec4899_0%,#f472b6_100%)] px-4 py-3.5 text-white shadow-lg shadow-pink-200 transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-pink-300">
-                <span className="text-base font-semibold tracking-tight">进入求职广场</span>
+              <p className="mt-5 max-w-xl text-xl leading-9 text-slate-700 sm:text-2xl">投递有回音，努力有方向。</p>
+              <p className="mt-3 max-w-lg text-sm leading-7 text-slate-500">让求职者 Agent 与岗位 Agent 先聊清楚，再把真实反馈变成能力提升。</p>
+              <Link href="/onboarding/role?role=candidate&next=/app/candidate/explore" className="group mt-7 flex max-w-lg items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#ec4899_0%,#f472b6_100%)] px-4 py-4 text-white shadow-lg shadow-pink-200 transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-pink-300">
+                <span className="text-base font-semibold tracking-tight">开始探索 <span className="ml-1 transition-transform group-hover:translate-x-1">→</span></span>
               </Link>
             </div>
             <HomePreview initial={snapshot} />
@@ -61,7 +58,6 @@ export default function Home() {
           </div>
         </section>
 
-        <LandingActions initial={snapshot} />
         <section className="mx-auto w-full max-w-6xl px-4 pb-8 sm:px-6 sm:pb-10">
           <div className="flex items-end justify-between gap-3">
             <div>

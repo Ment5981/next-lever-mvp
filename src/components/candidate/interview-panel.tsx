@@ -41,7 +41,12 @@ export function InterviewPanel({
   const [mode, setMode] = useState<InterviewMode>("live");
   const [answerDraft, setAnswerDraft] = useState<Record<string, string>>({});
   const [summaryDraft, setSummaryDraft] = useState<Record<string, string>>({});
+  const [speaking, setSpeaking] = useState(false);
+  const [cameraOn, setCameraOn] = useState(false);
+  const [cameraError, setCameraError] = useState("");
   const spokenTurnRef = useRef<string | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const cameraStreamRef = useRef<MediaStream | null>(null);
 
   const turns = interview?.turns ?? [];
   const answered = turns.filter((turn) => turn.raw_answer.trim().length > 0);
@@ -50,13 +55,55 @@ export function InterviewPanel({
   const activeTurn = activeIndex >= 0 ? turns[activeIndex] : null;
 
   const speakQuestion = useCallback((question: string) => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+      setSpeaking(false);
+      return;
+    }
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(question);
     utterance.lang = "zh-CN";
     utterance.rate = 0.95;
+    utterance.onstart = () => setSpeaking(true);
+    utterance.onend = () => setSpeaking(false);
+    utterance.onerror = () => setSpeaking(false);
     window.speechSynthesis.speak(utterance);
   }, []);
+
+  function interruptQuestion() {
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
+    setSpeaking(false);
+  }
+
+  async function toggleCamera() {
+    if (cameraOn) {
+      cameraStreamRef.current?.getTracks().forEach((track) => track.stop());
+      cameraStreamRef.current = null;
+      if (videoRef.current) videoRef.current.srcObject = null;
+      setCameraOn(false);
+      return;
+    }
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setCameraError("当前浏览器不支持摄像头预览");
+      return;
+    }
+    try {
+      setCameraError("");
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      cameraStreamRef.current = stream;
+      if (videoRef.current) videoRef.current.srcObject = stream;
+      setCameraOn(true);
+    } catch {
+      setCameraError("没有打开摄像头权限，面试仍可继续");
+    }
+  }
+
+  useEffect(() => {
+    if (cameraOn && videoRef.current && cameraStreamRef.current) {
+      videoRef.current.srcObject = cameraStreamRef.current;
+    }
+  }, [cameraOn]);
 
   useEffect(() => {
     if (mode !== "live" || !activeTurn || busy) return;
@@ -71,6 +118,9 @@ export function InterviewPanel({
       if (typeof window !== "undefined" && "speechSynthesis" in window) {
         window.speechSynthesis.cancel();
       }
+      setSpeaking(false);
+      cameraStreamRef.current?.getTracks().forEach((track) => track.stop());
+      cameraStreamRef.current = null;
     },
     [],
   );
@@ -231,21 +281,23 @@ export function InterviewPanel({
         )}
 
         {mode === "live" && activeTurn && (
-          <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-950 p-4 text-white sm:p-6">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(99,102,241,0.34),transparent_45%)]" />
+          <div className="relative min-h-[600px] overflow-hidden rounded-3xl border border-slate-800 bg-[#070a1c] p-5 text-white shadow-[0_30px_100px_rgba(15,23,42,0.2)] sm:p-10">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_12%,rgba(96,165,250,0.28),transparent_24%),radial-gradient(circle_at_15%_75%,rgba(129,140,248,0.18),transparent_25%),radial-gradient(circle_at_85%_62%,rgba(45,212,191,0.12),transparent_20%),radial-gradient(circle_at_18%_20%,rgba(255,255,255,0.55)_0_1px,transparent_1.5px),radial-gradient(circle_at_78%_32%,rgba(255,255,255,0.42)_0_1px,transparent_1.5px),radial-gradient(circle_at_58%_82%,rgba(255,255,255,0.38)_0_1px,transparent_1.5px)]" />
             <div className="relative space-y-5">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2"><span className="size-2 animate-pulse rounded-full bg-emerald-400" /><span className="text-xs font-medium text-emerald-300">LIVE</span><span className="text-xs text-slate-400">AI 面试官</span></div>
-                <span className="text-xs text-slate-400">第 {activeIndex + 1} / {turns.length} 问</span>
+                <div className="flex items-center gap-2"><span className="text-xs text-slate-400">第 {activeIndex + 1} / {turns.length} 问</span>{speaking && <button type="button" onClick={interruptQuestion} className="rounded-full border border-white/20 px-2.5 py-1 text-xs text-white transition hover:border-white/50 hover:bg-white/10">打断 AI</button>}<button type="button" onClick={() => void toggleCamera()} className="rounded-full border border-white/20 px-2.5 py-1 text-xs text-white transition hover:border-white/50 hover:bg-white/10">{cameraOn ? "关闭镜头" : "开摄像头"}</button></div>
               </div>
               <div className="mx-auto grid max-w-sm place-items-center gap-4 py-2 text-center">
                 <div className="relative grid size-24 place-items-center rounded-full bg-indigo-500/20 ring-1 ring-indigo-300/30">
                   <div className="grid size-16 place-items-center rounded-full bg-gradient-to-br from-indigo-400 to-teal-300 text-2xl text-white shadow-2xl shadow-indigo-500/40">✦</div>
                   <span className="absolute inset-0 animate-ping rounded-full bg-indigo-400/10" />
                 </div>
-                <p className="text-sm text-slate-300">AI 正在向你提问</p>
+                <p className="text-sm text-slate-300">{speaking ? "AI 正在说话 · 可随时打断" : "轮到你了，开口回答"}</p>
               </div>
               <div className="mx-auto max-w-2xl rounded-2xl rounded-tl-sm bg-white/10 p-4 text-center text-base leading-relaxed text-white ring-1 ring-white/10">{activeTurn.question}</div>
+              {cameraOn && <div className="mx-auto max-w-xs overflow-hidden rounded-2xl border border-white/15 bg-white/10"><video ref={videoRef} autoPlay muted playsInline className="aspect-video w-full object-cover" /><p className="px-3 py-2 text-left text-[11px] text-slate-300">仅本地预览，不上传视频</p></div>}
+              {cameraError && <p className="text-center text-xs text-amber-300">{cameraError}</p>}
               <div className="mx-auto max-w-md">
                 <VoiceInput
                   live

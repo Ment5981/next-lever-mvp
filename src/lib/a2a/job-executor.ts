@@ -87,11 +87,17 @@ type PendingClarification = {
 export class JobAgentExecutor implements AgentExecutor {
   private readonly job: JobVersion;
   private readonly hooks: JobExecutorHooks;
+  private readonly demoMock: boolean;
   private readonly pending = new Map<string, PendingClarification>();
 
-  constructor(job: JobVersion, hooks: JobExecutorHooks = {}) {
+  constructor(
+    job: JobVersion,
+    hooks: JobExecutorHooks = {},
+    options: { demoMock?: boolean } = {},
+  ) {
     this.job = job;
     this.hooks = hooks;
+    this.demoMock = options.demoMock ?? false;
   }
 
   async execute(context: RequestContext, eventBus: ExecutionEventBus): Promise<void> {
@@ -177,6 +183,7 @@ export class JobAgentExecutor implements AgentExecutor {
       job: this.job,
       evidence: payload.evidence,
       preset,
+      demoMock: this.demoMock,
     });
 
     const gap = this.findClarificationTarget(judged.data);

@@ -67,7 +67,9 @@ export function RoleHub({ role, initial }: { role: Role; initial: WorkspaceState
   const copy = roleCopy[role];
   const confirmedJobs = initial.jobs.filter((job) => job.confirmed);
   const candidateReady = Boolean(initial.candidate_agent && initial.disclosure_confirmed);
-  const published = role === "candidate" ? candidateReady : confirmedJobs.length > 0;
+  const published = role === "candidate"
+    ? initial.candidate_marketplace_posts.some((post) => post.published)
+    : initial.jobs.some((job) => job.confirmed && job.published);
 
   return (
     <div className="space-y-5">
@@ -88,14 +90,14 @@ export function RoleHub({ role, initial }: { role: Role; initial: WorkspaceState
         {role === "candidate" ? (
           <>
             <StepCard index="01" title="建立我的 Agent" detail="材料与面试回答，由你确认后生成。" href="/candidate/materials" complete={initial.candidate.materials_confirmed} tone="indigo" />
-            <StepCard index="02" title="发布到求职广场" detail="选择公开范围，找到合适的岗位 Agent。" href="/marketplace" complete={published} tone="indigo" />
-            <StepCard index="03" title="管理 Agent 与成长" detail="看对话反馈，继续补齐能力。" href="/candidate/workbench" complete={initial.reports.length > 0} tone="indigo" />
+            <StepCard index="02" title="发布到求职广场" detail="编辑求职卡，确认后公开展示。" href="/candidate/publish" complete={published} tone="indigo" />
+            <StepCard index="03" title="成长教练" detail="看懂岗位对话，把差距变成下一步。" href="/coach" complete={initial.reports.length > 0} tone="indigo" />
           </>
         ) : (
           <>
             <StepCard index="01" title="生成招聘 Agent" detail="描述岗位，确认能力模型。" href="/employer/job" complete={confirmedJobs.length > 0} tone="slate" />
-            <StepCard index="02" title="发布岗位 Agent" detail="把岗位放进求职广场。" href="/marketplace" complete={confirmedJobs.length > 0} tone="slate" />
-            <StepCard index="03" title="查看候选人对话" detail="检查证据，完成真人决策。" href="/employer/workbench" complete={initial.decisions.length > 0} tone="slate" />
+            <StepCard index="02" title="发布岗位 Agent" detail="确认后把岗位放进求职广场。" href="/employer/manage" complete={published} tone="slate" />
+            <StepCard index="03" title="招聘方管理" detail="管理岗位 Agent，查看对话与真人决策。" href="/employer/manage" complete={initial.decisions.length > 0} tone="slate" />
           </>
         )}
       </div>
@@ -104,7 +106,7 @@ export function RoleHub({ role, initial }: { role: Role; initial: WorkspaceState
         <Panel
           title="我的 Agent"
           subtitle={candidateReady ? "已准备好进入求职广场。" : "完成材料确认后，这里会出现你的 Agent。"}
-          aside={<Link href="/candidate/workbench" className="text-sm font-medium text-indigo-700">进入工作台 →</Link>}
+          aside={<Link href="/candidate/manage" className="text-sm font-medium text-indigo-700">进入管理 →</Link>}
         >
           {candidateReady ? (
             <div className="flex flex-col gap-3 rounded-2xl border border-indigo-200 bg-indigo-50 p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -121,12 +123,13 @@ export function RoleHub({ role, initial }: { role: Role; initial: WorkspaceState
       ) : (
         <Panel title="已发布岗位" subtitle="岗位 Agent 出现在求职广场后，候选人可以开始对话。">
           <div className="grid gap-2 sm:grid-cols-3">
-            {confirmedJobs.map((job) => (
+            {confirmedJobs.filter((job) => job.published).map((job) => (
               <Link key={job.job_version_id} href={`/marketplace?job=${job.job_version_id}`} className="rounded-xl border border-slate-200 p-3 transition hover:border-indigo-300 hover:bg-indigo-50">
                 <p className="text-xs text-slate-500">{job.company_name}</p>
                 <p className="mt-1 font-medium text-slate-900">{job.title}</p>
               </Link>
             ))}
+            {confirmedJobs.every((job) => !job.published) && <p className="text-sm text-slate-500">还没有公开岗位，去管理页发布第一个岗位 Agent。</p>}
           </div>
         </Panel>
       )}
@@ -135,10 +138,10 @@ export function RoleHub({ role, initial }: { role: Role; initial: WorkspaceState
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm font-semibold text-slate-900">{role === "candidate" ? "已经有岗位在等你" : "想看完整判断过程"}</p>
-            <p className="mt-1 text-xs text-slate-500">{role === "candidate" ? "打开求职广场，先看岗位，再决定是否聊天。" : "进入工作台，查看 Task、证据与真人决策。"}</p>
+            <p className="mt-1 text-xs text-slate-500">{role === "candidate" ? "打开求职广场，先看岗位，再决定是否聊天。" : "进入招聘方管理，查看 Agent 对话和真人决策。"}</p>
           </div>
-          <Link href={role === "candidate" ? "/marketplace" : "/employer/workbench"} className="shrink-0 rounded-xl bg-white px-4 py-2 text-center text-sm font-medium text-slate-900 shadow-sm ring-1 ring-slate-200 hover:ring-indigo-300">
-            {role === "candidate" ? "打开求职广场" : "打开招聘工作台"}
+          <Link href={role === "candidate" ? "/marketplace" : "/employer/manage"} className="shrink-0 rounded-xl bg-white px-4 py-2 text-center text-sm font-medium text-slate-900 shadow-sm ring-1 ring-slate-200 hover:ring-indigo-300">
+            {role === "candidate" ? "打开求职广场" : "进入招聘方管理"}
           </Link>
         </div>
       </div>

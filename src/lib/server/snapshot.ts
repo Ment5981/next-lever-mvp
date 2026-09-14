@@ -4,7 +4,9 @@ import { PRESET_JOB_MATCH_REASONS } from "@/lib/demo/preset-jobs";
 import { llmStatus } from "@/lib/providers/llm";
 import { zhihuCounters, zhihuStatus } from "@/lib/providers/zhihu";
 import { getState } from "@/lib/store/store";
+import { isA2ADispatchRunning } from "@/lib/a2a/orchestrator";
 import type { WorkspaceState } from "@/lib/client/types";
+import { persistenceStatus } from "@/lib/db/client";
 
 /**
  * 工作台全量快照。
@@ -18,6 +20,7 @@ export function workspaceSnapshot(): WorkspaceState {
   return {
     schema_version: SCHEMA_VERSION,
     jobs: state.jobs,
+    candidate_marketplace_posts: state.candidateMarketplacePosts,
     job_match_reasons: PRESET_JOB_MATCH_REASONS,
     candidate: state.candidate,
     interview: state.interview,
@@ -39,5 +42,7 @@ export function workspaceSnapshot(): WorkspaceState {
       compat_note: A2A_COMPAT_NOTE,
     },
     zhihu_counters: zhihuCounters(),
+    persistence: persistenceStatus(),
+    a2a_running: isA2ADispatchRunning(),
   };
 }
