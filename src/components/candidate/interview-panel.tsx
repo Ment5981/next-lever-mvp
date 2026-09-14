@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/button";
 import { VoiceInput } from "@/components/voice-input";
 import { Badge, Blockers, Notice, Panel } from "@/components/ui";
@@ -18,9 +18,9 @@ export type InterviewAction =
   | { action: "confirm_summary"; turn_id: string; answer_summary: string }
   | { action: "complete" };
 
-type InterviewMode = "voice" | "manual";
+type InterviewMode = "live" | "manual";
 
-/** AI 语音面试与手动微调共存，回答仍由用户确认后才进入求职者 Agent。 */
+/** 实时语音面试房间：Agent 一问一答，手动模式用于复盘和微调。 */
 export function InterviewPanel({
   jobs,
   interview,
@@ -38,18 +38,16 @@ export function InterviewPanel({
   busy: string | null;
   blockers: string[];
 }) {
-  const [mode, setMode] = useState<InterviewMode>("voice");
+  const [mode, setMode] = useState<InterviewMode>("live");
   const [answerDraft, setAnswerDraft] = useState<Record<string, string>>({});
   const [summaryDraft, setSummaryDraft] = useState<Record<string, string>>({});
-  const [voiceTurn, setVoiceTurn] = useState<Record<string, boolean>>({});
+  const spokenTurnRef = useRef<string | null>(null);
 
   const turns = interview?.turns ?? [];
   const answered = turns.filter((turn) => turn.raw_answer.trim().length > 0);
   const summariesConfirmed = turns.filter((turn) => turn.summary_confirmed);
   const activeIndex = turns.findIndex((turn) => !turn.raw_answer.trim());
-  // 预置演示会带有已完成问答，仍保留一题可体验语音面试与回填。
-  const voiceIndex = activeIndex >= 0 ? activeIndex : turns.length - 1;
-  const activeTurn = voiceIndex >= 0 ? turns[voiceIndex] : null;
+  const activeTurn = activeIndex >= 0 ? turns[activeIndex] : null;
 
   const speakQuestion = useCallback((question: string) => {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
@@ -59,6 +57,14 @@ export function InterviewPanel({
     utterance.rate = 0.95;
     window.speechSynthesis.speak(utterance);
   }, []);
+
+  useEffect(() => {
+    if (mode !== "live" || !activeTurn || busy) return;
+    if (spokenTurnRef.current === activeTurn.turn_id) return;
+    spokenTurnRef.current = activeTurn.turn_id;
+    const timer = window.setTimeout(() => speakQuestion(activeTurn.question), 350);
+    return () => window.clearTimeout(timer);
+  }, [activeTurn, busy, mode, speakQuestion]);
 
   useEffect(
     () => () => {
@@ -73,23 +79,8 @@ export function InterviewPanel({
     return answerDraft[turn.turn_id] ?? turn.raw_answer;
   }
 
-  function setDraft(turn: InterviewTurn, value: string, fromVoice = false) {
+  function setDraft(turn: InterviewTurn, value: string) {
     setAnswerDraft((prev) => ({ ...prev, [turn.turn_id]: value }));
-    setVoiceTurn((prev) => ({ ...prev, [turn.turn_id]: fromVoice }));
-  }
-
-  function submitAnswer(turn: InterviewTurn) {
-    const draft = draftFor(turn);
-    return onAction(
-      {
-        action: "answer",
-        turn_id: turn.turn_id,
-        answer_mode: voiceTurn[turn.turn_id] ? "voice" : "text",
-        raw_answer: draft,
-        transcript_confirmed: voiceTurn[turn.turn_id] ?? false,
-      },
-      `answer-${turn.turn_id}`,
-    );
   }
 
   function summaryEditor(turn: InterviewTurn) {
@@ -102,9 +93,7 @@ export function InterviewPanel({
         <div className="mt-3 space-y-2">
           <textarea
             value={summaryDraft[turn.turn_id] ?? turn.answer_summary}
-            onChange={(event) =>
-              setSummaryDraft((prev) => ({ ...prev, [turn.turn_id]: event.target.value }))
-            }
+            onChange={(event) => setSummaryDraft((prev) => ({ ...prev, [turn.turn_id]: event.target.value }))}
             rows={3}
             className="w-full rounded-lg border border-slate-300 bg-white p-2 text-sm leading-relaxed"
           />
@@ -128,20 +117,27 @@ export function InterviewPanel({
     );
   }
 
+  function submitManualAnswer(turn: InterviewTurn) {
+    const draft = draftFor(turn);
+    return onAction(
+      {
+        action: "answer",
+        turn_id: turn.turn_id,
+        answer_mode: "text",
+        raw_answer: draft,
+        transcript_confirmed: false,
+      },
+      `answer-${turn.turn_id}`,
+    );
+  }
+
   function manualTurn(turn: InterviewTurn, index: number) {
     const draft = draftFor(turn);
-    const isCurrent = !turn.raw_answer.trim();
     return (
-      <details
-        key={turn.turn_id}
-        open={isCurrent}
-        className="group rounded-2xl border border-slate-200 bg-white"
-      >
+      <details key={turn.turn_id} open={!turn.raw_answer.trim()} className="group rounded-2xl border border-slate-200 bg-white">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-4 [&::-webkit-details-marker]:hidden">
           <div className="flex min-w-0 items-center gap-3">
-            <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-indigo-50 text-xs font-semibold text-indigo-700">
-              {String(index + 1).padStart(2, "0")}
-            </span>
+            <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-indigo-50 text-xs font-semibold text-indigo-700">{String(index + 1).padStart(2, "0")}</span>
             <span className="truncate text-sm font-medium text-slate-900">{turn.question}</span>
           </div>
           <span className="shrink-0 text-slate-400 transition group-open:rotate-180" aria-hidden="true">⌄</span>
@@ -155,37 +151,44 @@ export function InterviewPanel({
             value={draft}
             onChange={(event) => setDraft(turn, event.target.value)}
             rows={4}
-            placeholder="写下或微调你的回答"
+            placeholder="手动输入或微调回答"
             className="w-full rounded-xl border border-slate-300 p-3 text-sm leading-relaxed outline-none focus:border-indigo-400"
           />
-          <Button
-            variant="secondary"
-            onClick={() => submitAnswer(turn)}
-            busy={busy === `answer-${turn.turn_id}`}
-            disabled={draft.trim().length === 0}
-          >
-            提交回答
-          </Button>
+          <Button variant="secondary" onClick={() => submitManualAnswer(turn)} busy={busy === `answer-${turn.turn_id}`} disabled={draft.trim().length === 0}>提交回答</Button>
           {summaryEditor(turn)}
         </div>
       </details>
     );
   }
 
+  async function submitLiveAnswer(turn: InterviewTurn, transcript: string) {
+    setDraft(turn, transcript);
+    await onAction(
+      {
+        action: "answer",
+        turn_id: turn.turn_id,
+        answer_mode: "voice",
+        raw_answer: transcript,
+        transcript_confirmed: true,
+      },
+      `answer-${turn.turn_id}`,
+    );
+  }
+
   return (
     <Panel
       title="AI 模拟面试"
-      subtitle="像聊天一样回答，完成后可手动微调。"
+      subtitle="进入实时房间，和岗位 Agent 一问一答。"
       aside={<Badge tone={interview?.completed ? "good" : "accent"}>{interview?.completed ? "已完成" : "可开始"}</Badge>}
     >
       <div className="space-y-5">
-        <div className="overflow-hidden rounded-2xl bg-[linear-gradient(135deg,#eef2ff_0%,#f8fafc_52%,#ecfeff_100%)] p-4 sm:p-5">
+        <div className="overflow-hidden rounded-2xl bg-[linear-gradient(135deg,#111827_0%,#312e81_55%,#0f766e_100%)] p-4 text-white sm:p-5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex min-w-0 items-center gap-3">
-              <div className="grid size-11 shrink-0 place-items-center rounded-2xl bg-indigo-600 text-lg text-white shadow-lg shadow-indigo-200">✦</div>
+              <div className="grid size-11 shrink-0 place-items-center rounded-2xl bg-white/15 text-lg shadow-inner">✦</div>
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-slate-900">和 AI 面试官聊聊</p>
-                <p className="mt-1 text-xs text-slate-600">问题会根据你的材料和目标岗位生成</p>
+                <p className="text-sm font-semibold">实时 AI 面试</p>
+                <p className="mt-1 text-xs text-indigo-100">AI 会直接发问，你只需要开口回答</p>
               </div>
             </div>
             <div className="flex flex-wrap items-end gap-2">
@@ -194,83 +197,77 @@ export function InterviewPanel({
                 <select
                   value={targetJob}
                   onChange={(event) => onTargetJobChange(event.target.value)}
-                  className="min-h-10 max-w-full rounded-xl border border-white/80 bg-white/80 px-3 text-sm text-slate-800 shadow-sm outline-none focus:border-indigo-400"
+                  className="min-h-10 max-w-full rounded-xl border border-white/20 bg-white/10 px-3 text-sm text-white outline-none focus:border-white/60 [&>option]:text-slate-900"
                 >
                   {jobs.map((job) => <option key={job.job_version_id} value={job.job_version_id}>{job.company_name} · {job.title}</option>)}
                 </select>
               </label>
               <Button
-                onClick={() => onAction({ action: "generate", target_job_version_id: targetJob || null }, "generate")}
+                variant="secondary"
+                onClick={() => {
+                  spokenTurnRef.current = null;
+                  onAction({ action: "generate", target_job_version_id: targetJob || null }, "generate");
+                }}
                 busy={busy === "generate"}
-                className="min-h-10 whitespace-nowrap"
+                className="min-h-10 whitespace-nowrap border-white/20 bg-white text-indigo-900 hover:bg-indigo-50"
               >
-                {turns.length > 0 ? "重新开始" : "开始 AI 面试"}
+                {turns.length > 0 ? "重新进入" : "进入实时面试"}
               </Button>
             </div>
           </div>
         </div>
 
-        {turns.length === 0 && <Notice tone="neutral">点击上面的按钮，开始一次岗位模拟面试。</Notice>}
+        {turns.length === 0 && <Notice tone="neutral">点击“进入实时面试”，AI 面试官会开始第一问。</Notice>}
 
         {turns.length > 0 && (
           <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 p-1">
-            <button
-              type="button"
-              onClick={() => setMode("voice")}
-              className={`flex min-h-10 flex-1 items-center justify-center gap-2 rounded-lg px-3 text-sm font-medium transition ${mode === "voice" ? "bg-white text-indigo-700 shadow-sm" : "text-slate-500 hover:text-slate-800"}`}
-            >
-              <span aria-hidden="true">◉</span> AI 语音面试
+            <button type="button" onClick={() => setMode("live")} className={`flex min-h-10 flex-1 items-center justify-center gap-2 rounded-lg px-3 text-sm font-medium transition ${mode === "live" ? "bg-white text-indigo-700 shadow-sm" : "text-slate-500 hover:text-slate-800"}`}>
+              <span aria-hidden="true">◉</span> 实时语音
             </button>
-            <button
-              type="button"
-              onClick={() => setMode("manual")}
-              className={`flex min-h-10 flex-1 items-center justify-center gap-2 rounded-lg px-3 text-sm font-medium transition ${mode === "manual" ? "bg-white text-indigo-700 shadow-sm" : "text-slate-500 hover:text-slate-800"}`}
-            >
-              <span aria-hidden="true">✎</span> 自己编辑
+            <button type="button" onClick={() => setMode("manual")} className={`flex min-h-10 flex-1 items-center justify-center gap-2 rounded-lg px-3 text-sm font-medium transition ${mode === "manual" ? "bg-white text-indigo-700 shadow-sm" : "text-slate-500 hover:text-slate-800"}`}>
+              <span aria-hidden="true">✎</span> 手动微调
             </button>
           </div>
         )}
 
-        {mode === "voice" && activeTurn && (
-          <div className="space-y-4 rounded-2xl border border-indigo-100 bg-indigo-50/40 p-4 sm:p-6">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2"><Badge tone="accent">AI 面试官</Badge><span className="text-xs text-slate-500">问题 {voiceIndex + 1}/{turns.length}</span></div>
-              <Button variant="ghost" onClick={() => speakQuestion(activeTurn.question)} className="min-h-8 px-2 text-xs">听一遍</Button>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="grid size-9 shrink-0 place-items-center rounded-full bg-indigo-600 text-white shadow-md">✦</div>
-              <p className="max-w-2xl rounded-2xl rounded-tl-sm bg-white p-4 text-base leading-relaxed text-slate-900 shadow-sm">{activeTurn.question}</p>
-            </div>
-            <div className="mx-auto grid max-w-xs place-items-center gap-3 py-2">
-              <div className="flex h-10 items-end gap-1" aria-hidden="true">
-                {[18, 30, 42, 25, 36, 20, 32, 24, 40, 18, 28].map((height, index) => <span key={index} className="w-1.5 rounded-full bg-indigo-400/70" style={{ height }} />)}
+        {mode === "live" && activeTurn && (
+          <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-950 p-4 text-white sm:p-6">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(99,102,241,0.34),transparent_45%)]" />
+            <div className="relative space-y-5">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2"><span className="size-2 animate-pulse rounded-full bg-emerald-400" /><span className="text-xs font-medium text-emerald-300">LIVE</span><span className="text-xs text-slate-400">AI 面试官</span></div>
+                <span className="text-xs text-slate-400">第 {activeIndex + 1} / {turns.length} 问</span>
               </div>
-              <p className="text-xs text-slate-500">点击下方按钮，直接说出你的回答</p>
-            </div>
-            <VoiceInput
-              compact
-              label="开始说话"
-              confirmLabel="填入回答框"
-              onConfirm={(text) => setDraft(activeTurn, draftFor(activeTurn) ? `${draftFor(activeTurn)}\n${text}` : text, true)}
-            />
-            <textarea
-              value={draftFor(activeTurn)}
-              onChange={(event) => setDraft(activeTurn, event.target.value)}
-              rows={3}
-              placeholder="语音转写会出现在这里，也可以直接修改"
-              className="w-full rounded-xl border border-indigo-200 bg-white p-3 text-sm leading-relaxed outline-none focus:border-indigo-400"
-            />
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <span className="text-xs text-slate-500">转写确认后才会提交给 AI</span>
-              <Button onClick={() => submitAnswer(activeTurn)} busy={busy === `answer-${activeTurn.turn_id}`} disabled={draftFor(activeTurn).trim().length === 0}>提交这一题</Button>
+              <div className="mx-auto grid max-w-sm place-items-center gap-4 py-2 text-center">
+                <div className="relative grid size-24 place-items-center rounded-full bg-indigo-500/20 ring-1 ring-indigo-300/30">
+                  <div className="grid size-16 place-items-center rounded-full bg-gradient-to-br from-indigo-400 to-teal-300 text-2xl text-white shadow-2xl shadow-indigo-500/40">✦</div>
+                  <span className="absolute inset-0 animate-ping rounded-full bg-indigo-400/10" />
+                </div>
+                <p className="text-sm text-slate-300">AI 正在向你提问</p>
+              </div>
+              <div className="mx-auto max-w-2xl rounded-2xl rounded-tl-sm bg-white/10 p-4 text-center text-base leading-relaxed text-white ring-1 ring-white/10">{activeTurn.question}</div>
+              <div className="mx-auto max-w-md">
+                <VoiceInput
+                  live
+                  label="点击开始回答"
+                  confirmLabel="确认并发送"
+                  onConfirm={(text) => void submitLiveAnswer(activeTurn, text)}
+                />
+              </div>
+              <p className="text-center text-xs text-slate-400">听完转写并确认后，AI 会自动进入下一问</p>
             </div>
           </div>
         )}
 
-        {mode === "voice" && turns.some((turn) => turn.raw_answer.trim()) && (
+        {mode === "live" && !activeTurn && turns.length > 0 && (
+          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">这次实时面试已回答完毕。可以切换到“手动微调”检查回答。</div>
+        )}
+
+        {mode === "live" && answered.length > 0 && (
           <details className="group rounded-2xl border border-slate-200">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-4 text-sm font-medium text-slate-800 [&::-webkit-details-marker]:hidden">
-              查看已完成问题 <span className="text-xs text-slate-400 transition group-open:rotate-180" aria-hidden="true">⌄</span>
+              面试记录 · {answered.length} 题已完成
+              <span className="text-xs text-slate-400 transition group-open:rotate-180" aria-hidden="true">⌄</span>
             </summary>
             <div className="space-y-2 border-t border-slate-100 p-3">
               {turns.map((turn, index) => turn.raw_answer.trim() ? <div key={turn.turn_id} className="rounded-xl bg-slate-50 p-3"><p className="text-xs text-slate-500">问题 {index + 1}</p><p className="mt-1 text-sm font-medium text-slate-800">{turn.question}</p>{summaryEditor(turn)}</div> : null)}
@@ -278,7 +275,7 @@ export function InterviewPanel({
           </details>
         )}
 
-        {mode === "manual" && <div className="space-y-2">{turns.map(manualTurn)}</div>}
+        {mode === "manual" && turns.length > 0 && <div className="space-y-2">{turns.map(manualTurn)}</div>}
 
         <Blockers items={blockers} />
         <div className="flex flex-wrap items-center gap-3 border-t border-slate-100 pt-4">

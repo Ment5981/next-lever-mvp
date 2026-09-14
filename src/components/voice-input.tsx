@@ -53,11 +53,13 @@ export function VoiceInput({
   onConfirm,
   confirmLabel = "确认这段转写",
   compact = false,
+  live = false,
 }: {
   label: string;
   onConfirm: (transcript: string) => void;
   confirmLabel?: string;
   compact?: boolean;
+  live?: boolean;
 }) {
   const [supported, setSupported] = useState<boolean | null>(null);
   const [listening, setListening] = useState(false);
@@ -112,6 +114,60 @@ export function VoiceInput({
     recognitionRef.current?.stop();
     setListening(false);
   }, []);
+
+  if (live) {
+    return (
+      <div className="space-y-3 rounded-2xl border border-indigo-200 bg-white/80 p-4 text-center shadow-sm">
+        {supported === false ? (
+          <p className="text-xs text-slate-500">当前浏览器不支持语音输入，请切换到手动编辑</p>
+        ) : (
+          <div className="flex flex-col items-center gap-3">
+            <Button
+              variant={listening ? "secondary" : "primary"}
+              onClick={listening ? stop : start}
+              className="size-16 rounded-full p-0 text-xs shadow-lg shadow-indigo-200"
+            >
+              <span className={`text-lg ${listening ? "animate-pulse" : ""}`} aria-hidden="true">◉</span>
+              <span className="sr-only">{listening ? "停止回答" : label}</span>
+            </Button>
+            <p className="text-xs font-medium text-slate-600">
+              {listening ? "正在听你说…" : label}
+            </p>
+          </div>
+        )}
+        {error && <p className="text-xs text-amber-700">{error}</p>}
+        {transcript && (
+          <div className="space-y-2 text-left">
+            <label className="block text-xs text-slate-500" htmlFor={`transcript-${label}`}>
+              听到的内容 · 确认前可修改
+            </label>
+            <textarea
+              id={`transcript-${label}`}
+              value={transcript}
+              onChange={(event) => setTranscript(event.target.value)}
+              rows={3}
+              className="w-full rounded-xl border border-sky-200 bg-white p-3 text-sm leading-relaxed"
+            />
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <Button variant="ghost" onClick={() => setTranscript("")} className="min-h-9 px-2 text-xs">
+                重说
+              </Button>
+              <Button
+                onClick={() => {
+                  onConfirm(transcript.trim());
+                  setTranscript("");
+                }}
+                disabled={transcript.trim().length === 0}
+                className="min-h-9 px-3 text-xs"
+              >
+                {confirmLabel}
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   if (compact) {
     return (
