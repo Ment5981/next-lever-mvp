@@ -140,6 +140,20 @@ export function JobBuilder({ initial }: { initial: WorkspaceState }) {
 
   return (
     <>
+      <div className="grid gap-2 sm:grid-cols-3">
+        <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-3">
+          <p className="text-[11px] font-semibold tracking-wider text-indigo-600 uppercase">01 / 输入</p>
+          <p className="mt-1 text-sm font-medium text-slate-900">把岗位讲清楚</p>
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-white p-3">
+          <p className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">02 / 生成</p>
+          <p className="mt-1 text-sm font-medium text-slate-600">回答关键追问</p>
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-white p-3">
+          <p className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">03 / 确认</p>
+          <p className="mt-1 text-sm font-medium text-slate-600">发布岗位版本</p>
+        </div>
+      </div>
       <Panel
         title="第一步：描述岗位"
         subtitle="语音入口是可选的。语音转写必须先确认，未确认的转写不会进入岗位模型。"

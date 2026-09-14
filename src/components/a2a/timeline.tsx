@@ -80,6 +80,39 @@ export function A2ATimeline({ initial }: { initial: WorkspaceState }) {
 
   return (
     <>
+      <section className="command-strip overflow-hidden p-4 sm:p-5">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold tracking-[0.16em] text-indigo-200 uppercase">
+              live collaboration map
+            </p>
+            <h2 className="mt-1 text-xl font-semibold tracking-tight text-white sm:text-2xl">
+              三个岗位 Agent，三条独立判断路径
+            </h2>
+          </div>
+          <span className="text-xs text-indigo-100">授权范围内 · 状态可追溯</span>
+        </div>
+        <div className="mt-5 grid gap-2 sm:grid-cols-3">
+          {state.jobs.slice(0, 3).map((job) => {
+            const task = state.tasks.find((item) => item.job_version_id === job.job_version_id);
+            const assessment = state.assessments.find((item) => item.job_version_id === job.job_version_id);
+            return (
+              <div key={job.job_version_id} className="rounded-xl border border-white/15 bg-white/10 p-3 backdrop-blur-sm">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="truncate text-xs font-medium text-white">{job.company_name}</span>
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-teal-300 shadow-[0_0_0_4px_rgba(94,234,212,0.16)]" />
+                </div>
+                <p className="mt-2 truncate text-sm text-indigo-50">{job.title}</p>
+                <div className="mt-3 flex items-center justify-between gap-2 text-xs text-indigo-100">
+                  <span>{task ? stateText(task.state) : "待发送"}</span>
+                  <span>{assessment ? `${assessment.soft_match_score.toFixed(1)} 分` : "等待评估"}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
       <Panel
         title="发送申请"
         subtitle="申请只能由你的授权触发。发送后每个岗位各有一条 Task，全过程的消息与产物都可回看。"

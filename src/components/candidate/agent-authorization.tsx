@@ -120,6 +120,20 @@ export function AgentAuthorization({ initial }: { initial: WorkspaceState }) {
 
   return (
     <>
+      <div className="command-strip p-4 sm:p-5">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold tracking-[0.16em] text-indigo-200 uppercase">consent checkpoint</p>
+            <h2 className="mt-1 text-xl font-semibold tracking-tight text-white sm:text-2xl">你决定 Agent 带走什么</h2>
+          </div>
+          <span className="text-xs text-indigo-100">{selected.length} / {state.jobs.length} 个岗位已选择</span>
+        </div>
+        <div className="mt-4 grid gap-2 sm:grid-cols-3">
+          <div className="rounded-xl border border-white/15 bg-white/10 p-3 text-sm text-white">已确认事实 <strong className="ml-1 text-teal-200">{sharedEvidence.length}</strong></div>
+          <div className="rounded-xl border border-white/15 bg-white/10 p-3 text-sm text-white">项目作品 <strong className="ml-1 text-teal-200">{sharedPortfolio.length}</strong></div>
+          <div className="rounded-xl border border-white/15 bg-white/10 p-3 text-sm text-white">面试摘要 <strong className="ml-1 text-teal-200">{sharedTurns.length}</strong></div>
+        </div>
+      </div>
       <Panel
         title="第一步：逐项决定共享什么"
         subtitle="只有你确认过的事实和面试摘要才会出现在这里。勾选即代表允许共享给你稍后授权的岗位。"

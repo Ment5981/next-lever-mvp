@@ -1,8 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f6f8fc;
+  --foreground: #12213f;
+  --ink: #12213f;
+  --muted: #667695;
+  --line: #dbe3f0;
+  --accent: #4f46e5;
+  --accent-dark: #3730a3;
+  --surface: #ffffff;
 }
 
 @theme inline {
@@ -22,5 +28,223 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: #c7d2fe;
+  color: #1e1b4b;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid rgb(99 102 241 / 0.35);
+  outline-offset: 1px;
+  border-color: #818cf8 !important;
+}
+
+.surface-panel {
+  border-color: var(--line) !important;
+  border-radius: 1.25rem !important;
+  box-shadow: 0 14px 38px rgb(42 63 107 / 0.06) !important;
+}
+
+.surface-panel:hover {
+  box-shadow: 0 18px 44px rgb(42 63 107 / 0.08) !important;
+}
+
+.stage-grid {
+  background-image: linear-gradient(to right, rgb(219 227 240 / 0.34) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(219 227 240 / 0.34) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+
+.agent-stage {
+  position: relative;
+  min-height: 25rem;
+  overflow: hidden;
+  border: 1px solid #cbd5e1;
+  border-radius: 1.5rem;
+  background: #f8fafc;
+  box-shadow: 0 24px 60px rgb(30 41 59 / 0.12);
+}
+
+.agent-stage::before,
+.agent-stage::after {
+  position: absolute;
+  content: "";
+  border-radius: 999px;
+  filter: blur(1px);
+}
+
+.agent-stage::before {
+  top: 18%;
+  left: 12%;
+  width: 11rem;
+  height: 11rem;
+  background: rgb(129 140 248 / 0.26);
+}
+
+.agent-stage::after {
+  right: -2rem;
+  bottom: -4rem;
+  width: 15rem;
+  height: 15rem;
+  background: rgb(45 212 191 / 0.2);
+}
+
+.agent-node {
+  position: absolute;
+  z-index: 1;
+  border: 1px solid rgb(255 255 255 / 0.86);
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.88);
+  padding: 0.85rem;
+  box-shadow: 0 12px 30px rgb(30 41 59 / 0.12);
+  backdrop-filter: blur(12px);
+}
+
+.agent-node-main {
+  top: 35%;
+  left: 35%;
+  width: 10rem;
+  border-color: #818cf8;
+  background: #eef2ff;
+}
+
+.agent-node-a {
+  top: 10%;
+  left: 8%;
+}
+
+.agent-node-b {
+  top: 10%;
+  right: 8%;
+}
+
+.agent-node-c {
+  right: 9%;
+  bottom: 10%;
+}
+
+.agent-connection {
+  position: absolute;
+  z-index: 0;
+  height: 1px;
+  transform-origin: left center;
+  background: linear-gradient(90deg, #a5b4fc, #5eead4);
+}
+
+.connection-a {
+  top: 36%;
+  left: 27%;
+  width: 26%;
+  transform: rotate(34deg);
+}
+
+.connection-b {
+  top: 36%;
+  right: 25%;
+  width: 26%;
+  transform: rotate(146deg);
+}
+
+.connection-c {
+  right: 25%;
+  bottom: 28%;
+  width: 26%;
+  transform: rotate(205deg);
+}
+
+.pulse-dot {
+  position: absolute;
+  z-index: 2;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: #4f46e5;
+  box-shadow: 0 0 0 5px rgb(99 102 241 / 0.13);
+}
+
+.command-strip {
+  border: 1px solid #cbd5e1;
+  border-radius: 1.25rem;
+  background: linear-gradient(110deg, #172554, #253b80 58%, #0f766e);
+  color: white;
+  box-shadow: 0 18px 42px rgb(30 41 59 / 0.14);
+}
+
+.timeline-lane {
+  position: relative;
+}
+
+.timeline-lane::before {
+  position: absolute;
+  top: 1.45rem;
+  bottom: 1.45rem;
+  left: 0.7rem;
+  width: 1px;
+  background: #c7d2fe;
+  content: "";
+}
+
+.timeline-event {
+  position: relative;
+  padding-left: 2.1rem;
+}
+
+.timeline-event::before {
+  position: absolute;
+  top: 0.55rem;
+  left: 0.43rem;
+  width: 0.6rem;
+  height: 0.6rem;
+  border: 2px solid #818cf8;
+  border-radius: 999px;
+  background: white;
+  content: "";
+}
+
+.decision-dock {
+  position: sticky;
+  bottom: 1rem;
+  z-index: 5;
+  border: 1px solid #c7d2fe;
+  border-radius: 1rem;
+  background: rgb(238 242 255 / 0.94);
+  padding: 0.8rem;
+  box-shadow: 0 14px 30px rgb(49 46 129 / 0.12);
+  backdrop-filter: blur(12px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+@media (max-width: 639px) {
+  .agent-stage {
+    min-height: 20rem;
+  }
+
+  .agent-node-main {
+    left: 28%;
+  }
+
+  .agent-node {
+    padding: 0.7rem;
+  }
 }

@@ -52,44 +52,64 @@ export default function Home() {
     <div className="flex min-h-full flex-col bg-slate-50">
       <Nav />
 
-      <section className="border-b border-slate-200 bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-          <p className="text-xs font-medium tracking-widest text-indigo-600 uppercase">
-            知乎 Hackathon 2026 · Agent-to-Agent
-          </p>
-          <h1 className="mt-3 max-w-3xl text-3xl leading-tight font-semibold tracking-tight text-slate-900 sm:text-5xl">
-            投出去的简历，第一次有了可追溯的回音
-          </h1>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
-            Next Lever 让你授权的求职者 Agent 同时与多个岗位 Agent
-            对话，把每一次「不合适」拆成看得见的证据、缺口和下一步动作，
-            最后落成几件真的能产出新证据的事。
-          </p>
-          <dl className="mt-8 grid gap-4 sm:grid-cols-3">
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-              <dt className="text-sm text-slate-500">拿到的不是分数</dt>
-              <dd className="mt-1 text-sm leading-relaxed text-slate-800">
-                每条结论都能点开看引用了哪条证据、来自哪个岗位、是 Agent
-                推断还是真人确认。
-              </dd>
+      <section className="stage-grid overflow-hidden border-b border-slate-200 bg-white">
+        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-10 sm:px-6 sm:py-14 lg:grid-cols-[1.03fr_0.97fr] lg:items-center lg:gap-16">
+          <div>
+            <p className="text-xs font-semibold tracking-[0.18em] text-indigo-600 uppercase">
+              知乎 Hackathon 2026 · Agent-to-Agent
+            </p>
+            <h1 className="mt-4 max-w-2xl text-4xl leading-[1.08] font-semibold tracking-[-0.04em] text-slate-950 sm:text-6xl">
+              投出去的简历，第一次有了可追溯的回音
+            </h1>
+            <p className="mt-5 max-w-xl text-base leading-8 text-slate-600 sm:text-lg">
+              让一个求职者 Agent 同时和多个岗位 Agent 对话，把一次「不合适」拆成证据、缺口和下一步动作。
+            </p>
+            <div className="mt-7 flex flex-wrap items-center gap-3 text-sm">
+              <a
+                href="#console"
+                className="inline-flex min-h-11 items-center rounded-xl bg-indigo-600 px-5 font-medium text-white shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5 hover:bg-indigo-500 active:scale-[0.98]"
+              >
+                进入工作台
+              </a>
+              <span className="text-slate-500">3 个岗位 · 1 条授权链 · 1 份成长报告</span>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-              <dt className="text-sm text-slate-500">披露范围你说了算</dt>
-              <dd className="mt-1 text-sm leading-relaxed text-slate-800">
-                字段级授权，一次确认，之后不会静默新增岗位或扩大共享内容。
-              </dd>
+          </div>
+
+          <div className="agent-stage stage-grid" aria-label="三个岗位 Agent 与求职者 Agent 协作示意">
+            <span className="agent-connection connection-a" />
+            <span className="agent-connection connection-b" />
+            <span className="agent-connection connection-c" />
+            <span className="pulse-dot" style={{ top: "33%", left: "33%" }} />
+            <span className="pulse-dot" style={{ top: "29%", right: "28%", background: "#0f766e" }} />
+            <div className="agent-node agent-node-a">
+              <p className="text-[10px] font-semibold tracking-wider text-indigo-600 uppercase">Job Agent A</p>
+              <p className="mt-1 text-sm font-medium text-slate-900">用户研究与闭环</p>
+              <p className="mt-2 text-xs text-emerald-700">建议邀约</p>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-              <dt className="text-sm text-slate-500">成长任务能验收</dt>
-              <dd className="mt-1 text-sm leading-relaxed text-slate-800">
-                比赛、开源、真实实践优先，每项都有交付物、验收标准和复评方式。
-              </dd>
+            <div className="agent-node agent-node-b">
+              <p className="text-[10px] font-semibold tracking-wider text-teal-700 uppercase">Job Agent B</p>
+              <p className="mt-1 text-sm font-medium text-slate-900">企业交付与结果</p>
+              <p className="mt-2 text-xs text-amber-700">需要补证</p>
             </div>
-          </dl>
+            <div className="agent-node agent-node-main">
+              <p className="text-[10px] font-semibold tracking-wider text-indigo-600 uppercase">Candidate Agent</p>
+              <p className="mt-1 text-sm font-semibold text-slate-950">林澈的求职者 Agent</p>
+              <p className="mt-2 text-xs text-indigo-700">只携带已确认证据</p>
+            </div>
+            <div className="agent-node agent-node-c">
+              <p className="text-[10px] font-semibold tracking-wider text-teal-700 uppercase">Growth Agent</p>
+              <p className="mt-1 text-sm font-medium text-slate-900">把反馈变成新证据</p>
+              <p className="mt-2 text-xs text-teal-700">3 项成长任务</p>
+            </div>
+            <div className="absolute right-4 bottom-4 left-4 z-10 flex items-center justify-between rounded-xl border border-white/80 bg-white/80 px-3 py-2 text-xs text-slate-600 backdrop-blur">
+              <span>协作上下文</span>
+              <span className="font-medium text-slate-900">授权范围内 · 可追溯</span>
+            </div>
+          </div>
         </div>
       </section>
 
-      <main className="mx-auto w-full max-w-6xl flex-1 space-y-10 px-4 py-10 sm:px-6">
+      <main id="console" className="mx-auto w-full max-w-6xl flex-1 space-y-10 px-4 py-10 sm:px-6">
         <HomeConsole initial={snapshot} />
 
         <section>
@@ -100,11 +120,12 @@ export default function Home() {
             {FLOW.map((item, index) => (
               <li
                 key={item.title}
-                className="rounded-2xl border border-slate-200 bg-white p-4"
+                className="surface-panel group rounded-2xl border border-slate-200 bg-white p-4 transition-transform hover:-translate-y-0.5"
               >
-                <p className="text-xs font-medium text-indigo-600">
-                  0{index + 1}
-                </p>
+                <div className="flex items-center gap-3">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-xs font-semibold text-indigo-700">0{index + 1}</span>
+                  <span className="h-px flex-1 bg-slate-200 group-last:hidden" />
+                </div>
                 <p className="mt-1 font-medium break-words text-slate-900">
                   {item.title}
                 </p>

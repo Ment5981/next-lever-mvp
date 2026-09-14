@@ -11,6 +11,7 @@ const eslintConfig = defineConfig([
     ".next/**",
     "out/**",
     "build/**",
+    "docs/**",
     "next-env.d.ts",
     // ArcReel 是工作区内的独立无关仓库，有自己的 lint 配置，不纳入本项目检查。
     "ArcReel/**",

@@ -154,6 +154,23 @@ export function MaterialsWorkbench({ initial }: { initial: WorkspaceState }) {
 
   return (
     <>
+      <div className="grid gap-2 sm:grid-cols-3">
+        <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-3">
+          <p className="text-[11px] font-semibold tracking-wider text-indigo-600 uppercase">01 / 材料</p>
+          <p className="mt-1 text-sm font-medium text-slate-900">只提取事实证据</p>
+          <p className="mt-1 text-xs text-indigo-700">{confirmedCount} 条已确认</p>
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-white p-3">
+          <p className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">02 / 面试</p>
+          <p className="mt-1 text-sm font-medium text-slate-600">回答岗位相关问题</p>
+          <p className="mt-1 text-xs text-slate-500">{interview?.turns.length ?? 0} 条回答</p>
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-white p-3">
+          <p className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">03 / Agent</p>
+          <p className="mt-1 text-sm font-medium text-slate-600">确认后才可投递</p>
+          <p className="mt-1 text-xs text-slate-500">材料与回答都可撤回</p>
+        </div>
+      </div>
       <Panel
         title="第一步：粘贴简历、项目材料与作品链接"
         subtitle="材料只在服务端内存里用于本次演示，不落盘、不记录完整简历。语音入口只做转写，不上传音频。"

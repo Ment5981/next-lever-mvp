@@ -187,6 +187,35 @@ export function GrowthReportView({ initial }: { initial: WorkspaceState }) {
         </Panel>
       ) : (
         <>
+          <section className="command-strip p-4 sm:p-5">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-xs font-semibold tracking-[0.16em] text-indigo-200 uppercase">
+                  growth signal map
+                </p>
+                <h2 className="mt-1 text-xl font-semibold tracking-tight text-white sm:text-2xl">
+                  从岗位反馈，到下一件可验证的事
+                </h2>
+              </div>
+              <span className="text-xs text-indigo-100">{report.growth_tasks.length} 项成长任务</span>
+            </div>
+            <div className="mt-5 grid gap-2 sm:grid-cols-4">
+              {CATEGORY_ORDER.map((category) => (
+                <div key={category} className="rounded-xl border border-white/15 bg-white/10 p-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs text-indigo-100">{FEEDBACK_CATEGORY_TEXT[category]}</span>
+                    <span className="text-lg font-semibold text-white">{report.signals.filter((signal) => signal.category === category).length}</span>
+                  </div>
+                  <p className="mt-3 text-xs text-teal-200">
+                    {report.signals.some((signal) => signal.category === category)
+                      ? "已整理原始引用"
+                      : "本次暂无信号"}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+
           <Panel
             title="样本与置信度"
             subtitle="先看样本规模再看结论。分数不做简单平均，置信度由最低单项与均值共同决定，并随样本量缩放。"

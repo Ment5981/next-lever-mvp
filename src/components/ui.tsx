@@ -13,7 +13,7 @@ export function Panel({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+    <section className="surface-panel rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
       {(title || aside) && (
         <header className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">

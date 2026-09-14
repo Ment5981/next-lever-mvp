@@ -32,7 +32,7 @@ export function Button({
       {...rest}
       disabled={rest.disabled || busy}
       aria-busy={busy}
-      className={`inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed ${VARIANT_CLASS[variant]} ${className}`}
+      className={`inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all active:scale-[0.98] disabled:cursor-not-allowed ${VARIANT_CLASS[variant]} ${className}`}
     >
       {busy ? "处理中…" : children}
     </button>

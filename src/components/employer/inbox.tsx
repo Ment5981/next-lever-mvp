@@ -156,6 +156,34 @@ export function EmployerInbox({ initial }: { initial: WorkspaceState }) {
 
   return (
     <>
+      <section className="command-strip p-4 sm:p-5">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold tracking-[0.16em] text-indigo-200 uppercase">
+              human review desk
+            </p>
+            <h2 className="mt-1 text-xl font-semibold tracking-tight text-white sm:text-2xl">
+              Agent 给建议，招聘方做决定
+            </h2>
+          </div>
+          <span className="text-xs text-indigo-100">{state.assessments.length} 个岗位等待确认</span>
+        </div>
+        <div className="mt-5 grid gap-2 sm:grid-cols-3">
+          <div className="rounded-xl border border-white/15 bg-white/10 p-3">
+            <p className="text-xs text-indigo-200">需要真人确认</p>
+            <p className="mt-1 text-2xl font-semibold text-white">{state.assessments.filter((item) => !state.decisions.some((d) => d.task_id === item.task_id)).length}</p>
+          </div>
+          <div className="rounded-xl border border-white/15 bg-white/10 p-3">
+            <p className="text-xs text-indigo-200">Agent 建议覆盖</p>
+            <p className="mt-1 text-2xl font-semibold text-white">{state.assessments.filter((item) => item.info_insufficient).length}</p>
+          </div>
+          <div className="rounded-xl border border-white/15 bg-white/10 p-3">
+            <p className="text-xs text-indigo-200">已完成真人决定</p>
+            <p className="mt-1 text-2xl font-semibold text-white">{state.decisions.length}</p>
+          </div>
+        </div>
+      </section>
+
       {notice && <Notice tone="good">{notice}</Notice>}
       <Blockers items={blockers} />
 
@@ -390,7 +418,7 @@ export function EmployerInbox({ initial }: { initial: WorkspaceState }) {
                   )}
                 </div>
               ) : (
-                <div className="space-y-3 rounded-xl border border-indigo-200 bg-indigo-50/30 p-3">
+                <div className="decision-dock space-y-3 rounded-xl border border-indigo-200 bg-indigo-50/30 p-3">
                   <p className="text-sm font-medium text-slate-900">
                     真人确认（Agent 建议仅供参考）
                   </p>

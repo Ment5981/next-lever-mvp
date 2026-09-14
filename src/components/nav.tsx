@@ -14,17 +14,24 @@ export function Nav({ current }: { current?: string }) {
   return (
     <nav
       aria-label="主流程"
-      className="border-b border-slate-200 bg-white/90 backdrop-blur"
+      className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 backdrop-blur"
     >
-      <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <Link
-            href="/"
-            className="text-sm font-semibold tracking-tight text-slate-900"
-          >
-            Next Lever
+      <div className="mx-auto max-w-6xl px-4 py-2.5 sm:px-6">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <Link href="/" className="flex shrink-0 items-center gap-2">
+            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-600 text-xs font-semibold text-white shadow-sm">
+              NL
+            </span>
+            <span>
+              <span className="block text-sm font-semibold tracking-tight text-slate-900">
+                Next Lever
+              </span>
+              <span className="hidden text-[10px] tracking-[0.18em] text-slate-400 uppercase sm:block">
+                agent workspace
+              </span>
+            </span>
           </Link>
-          <ul className="-mx-1 flex snap-x gap-1 overflow-x-auto pb-1 text-xs">
+          <ul className="-mx-1 flex snap-x gap-1 overflow-x-auto pb-0.5 text-xs [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {WORKSPACE_STEPS.map((step) => {
               const active = current === step.href;
               return (
@@ -67,7 +74,10 @@ export function PageShell({
       <Nav current={current} />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-8">
         <header className="mb-5">
-          <h1 className="text-xl font-semibold tracking-tight break-words text-slate-900 sm:text-2xl">
+          <p className="mb-2 text-[11px] font-semibold tracking-[0.16em] text-indigo-600 uppercase">
+            next lever / workspace
+          </p>
+          <h1 className="text-2xl font-semibold tracking-tight break-words text-slate-950 sm:text-3xl">
             {title}
           </h1>
           {lead && (
