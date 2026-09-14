@@ -4,6 +4,7 @@ import { LandingActions } from "@/components/landing-actions";
 import { Nav } from "@/components/nav";
 import { workspaceSnapshot } from "@/lib/server/snapshot";
 import { ZhihuHotList } from "@/components/zhihu-hot-list";
+import { ACTIVITY_LISTINGS } from "@/lib/demo/marketplace-data";
 
 export const dynamic = "force-dynamic";
 
@@ -61,6 +62,27 @@ export default function Home() {
         </section>
 
         <LandingActions initial={snapshot} />
+        <section className="mx-auto w-full max-w-6xl px-4 pb-8 sm:px-6 sm:pb-10">
+          <div className="flex items-end justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold tracking-[0.16em] text-pink-600 uppercase">GROWTH ACTIVITIES</p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">把差距变成一次真实实践</h2>
+            </div>
+            <Link href="/marketplace?tab=activities" className="shrink-0 text-sm font-medium text-pink-600 hover:text-pink-700">看全部 →</Link>
+          </div>
+          <div className="mt-4 grid gap-3 md:grid-cols-3">
+            {ACTIVITY_LISTINGS.slice(0, 3).map((activity) => (
+              <Link key={activity.id} href="/marketplace?tab=activities" className="group relative min-h-44 overflow-hidden rounded-2xl p-4 text-white shadow-sm">
+                <div className="absolute inset-0 bg-cover bg-center transition duration-500 group-hover:scale-105" style={{ backgroundImage: `url(${activity.image})` }} />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-slate-950/10" />
+                <div className="relative flex h-full flex-col justify-between">
+                  <div className="flex items-center justify-between gap-2"><span className="rounded-full bg-white/20 px-2 py-1 text-[10px] font-medium backdrop-blur">{activity.category}</span><span className="text-xs text-white/70">{activity.deadline}</span></div>
+                  <div><h3 className="text-lg font-semibold tracking-tight">{activity.title}</h3><p className="mt-1 line-clamp-2 text-xs leading-5 text-white/75">{activity.subtitle}</p></div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
         <section className="mx-auto w-full max-w-6xl px-4 pb-8 sm:px-6 sm:pb-10"><ZhihuHotList /></section>
       </main>
       <footer className="border-t border-slate-200 bg-white"><div className="mx-auto max-w-6xl px-4 py-5 text-xs leading-relaxed text-slate-500 sm:px-6">三个岗位 Agent · 可追溯 Demo · 知乎实时热榜</div></footer>
