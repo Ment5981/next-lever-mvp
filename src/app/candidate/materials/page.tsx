@@ -5,15 +5,15 @@ import { workspaceSnapshot } from "@/lib/server/snapshot";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "材料与模拟面试 · Next Level",
+  title: "建立我的 Agent · Next Level",
 };
 
 export default function CandidateMaterialsPage() {
   return (
     <PageShell
       current="/candidate/materials"
-      title="求职者材料与模拟面试"
-      lead="提交材料，确认事实，完成岗位模拟面试。"
+      title="建立我的 Agent"
+      lead="上传材料，完成一次 AI 模拟面试。"
     >
       <MaterialsWorkbench initial={workspaceSnapshot()} />
     </PageShell>

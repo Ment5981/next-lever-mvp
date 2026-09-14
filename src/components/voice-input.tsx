@@ -52,10 +52,12 @@ export function VoiceInput({
   label,
   onConfirm,
   confirmLabel = "确认这段转写",
+  compact = false,
 }: {
   label: string;
   onConfirm: (transcript: string) => void;
   confirmLabel?: string;
+  compact?: boolean;
 }) {
   const [supported, setSupported] = useState<boolean | null>(null);
   const [listening, setListening] = useState(false);
@@ -110,6 +112,59 @@ export function VoiceInput({
     recognitionRef.current?.stop();
     setListening(false);
   }, []);
+
+  if (compact) {
+    return (
+      <div className="space-y-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {supported === false ? (
+            <span className="text-xs text-slate-500">当前浏览器不支持语音输入</span>
+          ) : listening ? (
+            <Button variant="secondary" onClick={stop} className="min-h-9 px-3 text-xs">
+              <span className="size-2 animate-pulse rounded-full bg-rose-500" />
+              停止聆听
+            </Button>
+          ) : (
+            <Button variant="ghost" onClick={start} className="min-h-9 px-3 text-xs">
+              <span aria-hidden="true">◉</span>
+              {label}
+            </Button>
+          )}
+          {transcript && (
+            <Button variant="ghost" onClick={() => setTranscript("")} className="min-h-9 px-2 text-xs">
+              清空
+            </Button>
+          )}
+        </div>
+        {error && <p className="text-xs text-amber-700">{error}</p>}
+        {transcript && (
+          <div className="rounded-xl border border-sky-200 bg-sky-50/70 p-2">
+            <label className="sr-only" htmlFor={`transcript-${label}`}>
+              {label}转写结果
+            </label>
+            <textarea
+              id={`transcript-${label}`}
+              value={transcript}
+              onChange={(event) => setTranscript(event.target.value)}
+              rows={2}
+              className="w-full rounded-lg border border-sky-200 bg-white p-2 text-sm leading-relaxed"
+              placeholder="确认前可以修正转写"
+            />
+            <Button
+              onClick={() => {
+                onConfirm(transcript.trim());
+                setTranscript("");
+              }}
+              disabled={transcript.trim().length === 0}
+              className="mt-2 min-h-9 px-3 text-xs"
+            >
+              {confirmLabel}
+            </Button>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
