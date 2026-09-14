@@ -5,7 +5,7 @@ import { workspaceSnapshot } from "@/lib/server/snapshot";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "A2A 申请时间线 · Next Lever",
+  title: "A2A 申请时间线 · Next Level",
 };
 
 export default function A2APage() {

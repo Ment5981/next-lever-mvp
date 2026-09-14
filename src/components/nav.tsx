@@ -27,7 +27,7 @@ export function Nav({ current }: { current?: string }) {
             </span>
             <span>
               <span className="block text-sm font-semibold tracking-tight text-slate-900">
-                Next Lever
+                Next Level
               </span>
               <span className="hidden text-[10px] tracking-[0.18em] text-slate-400 uppercase sm:block">
                 agent workspace
@@ -84,7 +84,7 @@ export function PageShell({
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-8">
         <header className="mb-5">
           <p className="mb-2 text-[11px] font-semibold tracking-[0.16em] text-indigo-600 uppercase">
-            next lever / workspace
+                next level / workspace
           </p>
           <h1 className="text-2xl font-semibold tracking-tight break-words text-slate-950 sm:text-3xl">
             {title}

@@ -5,7 +5,7 @@ import { workspaceSnapshot } from "@/lib/server/snapshot";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "成长报告 · Next Lever",
+  title: "成长报告 · Next Level",
 };
 
 export default function GrowthPage() {

@@ -74,7 +74,7 @@ export function LandingActions({ initial }: { initial: WorkspaceState }) {
       <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
         <div>
           <p className="text-sm font-semibold text-slate-900">先看完整 Demo</p>
-          <p className="mt-1 text-xs text-slate-500">三方 Agent 对话，生成一份成长建议。</p>
+          <p className="mt-1 text-xs text-slate-500">三场 Agent 对话 · 一份提升安排。</p>
         </div>
         <Button variant="secondary" onClick={runDemo} busy={busy}>
           观看完整 Demo

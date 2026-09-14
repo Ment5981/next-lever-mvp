@@ -5,7 +5,7 @@ import { workspaceSnapshot } from "@/lib/server/snapshot";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "材料与模拟面试 · Next Lever",
+  title: "材料与模拟面试 · Next Level",
 };
 
 export default function CandidateMaterialsPage() {

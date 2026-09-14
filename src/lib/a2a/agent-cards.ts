@@ -5,8 +5,8 @@ import { PROTOCOL_VERSION } from "./protocol";
 export { AGENT_CARD_PATH };
 
 const PROVIDER = {
-  organization: "Next Lever",
-  url: "https://next-lever.example.com",
+  organization: "Next Level",
+  url: "https://next-level.example.com",
 };
 
 const CAPABILITIES = {

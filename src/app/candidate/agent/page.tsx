@@ -5,7 +5,7 @@ import { workspaceSnapshot } from "@/lib/server/snapshot";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Agent 与授权 · Next Lever",
+  title: "Agent 与授权 · Next Level",
 };
 
 export default function CandidateAgentPage() {

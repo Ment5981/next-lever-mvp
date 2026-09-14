@@ -5,7 +5,7 @@ import { workspaceSnapshot } from "@/lib/server/snapshot";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "招聘方工作台 · Next Lever",
+  title: "招聘方工作台 · Next Level",
 };
 
 export default function EmployerInboxPage() {

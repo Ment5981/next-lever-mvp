@@ -65,8 +65,8 @@ export function HomePreview({ initial }: { initial: WorkspaceState }) {
     <div className="agent-stage stage-grid p-4 sm:p-5" aria-label="Agent 协作预览">
       <div className="relative z-10 flex items-start justify-between gap-4">
         <div>
-          <p className="text-[10px] font-semibold tracking-[0.18em] text-indigo-600 uppercase">live preview</p>
-          <p className="mt-1 text-sm font-medium text-slate-900">选择一个岗位 Agent</p>
+          <p className="text-[10px] font-semibold tracking-[0.18em] text-indigo-600 uppercase">A2A PREVIEW</p>
+          <p className="mt-1 text-sm font-medium text-slate-900">看一眼岗位反馈</p>
         </div>
         <span className="rounded-full border border-slate-200 bg-white/80 px-2 py-1 text-[10px] text-slate-500">可追溯</span>
       </div>
@@ -120,8 +120,8 @@ export function HomePreview({ initial }: { initial: WorkspaceState }) {
       </div>
 
       <div className="absolute right-4 bottom-4 left-4 z-10 flex items-center justify-between rounded-xl border border-white/80 bg-white/80 px-3 py-2 text-[10px] text-slate-500 backdrop-blur">
-        <span>求职者 Agent</span>
-        <span className="font-medium text-slate-700">已确认材料 → 岗位判断 → 成长任务</span>
+        <span>岗位 Agent</span>
+        <span className="font-medium text-slate-700">判断差距 → 安排下一步</span>
       </div>
     </div>
   );

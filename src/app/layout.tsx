@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Next Lever — Agent-to-Agent 求职反馈与能力成长平台",
+  title: "Next Level — Agent-to-Agent 求职反馈与能力成长平台",
   description:
-    "用户授权的求职者 Agent 与多个岗位 Agent 通过 A2A 沟通，产出可追溯的能力成长任务。",
+    "让求职者 Agent 与岗位 Agent 先聊清匹配，再把能力差距变成可执行的提升安排。",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

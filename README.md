@@ -1,8 +1,8 @@
-# Next Lever
+# Next Level
 
-Agent-to-Agent 求职反馈与能力成长平台，知乎 Hackathon 2026 MVP。
+Agent-to-Agent 求职招聘与能力提升平台，知乎 Hackathon 2026 MVP。
 
-核心链路是一句话：**用户授权的求职者 Agent 与多个岗位 Agent 沟通后，得到可追溯的成长任务。**
+核心链路是一句话：**让 Agent 先聊清岗位匹配，再把能力差距变成可执行的提升安排。**
 
 ```text
 招聘方输入岗位（文字/语音）→ AI 有限追问 → 岗位能力模型（权重合计 100%）→ JobAgent
