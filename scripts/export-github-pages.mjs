@@ -39,6 +39,12 @@ function rewriteRootUrls(html, route) {
   return html
     .replace(/((?:href|src)=["'])\/(?!\/)/g, `$1${prefix}`)
     .replace(/(["'])\/_next\//g, `$1${prefix}_next/`)
+    // GitHub Pages only serves the exported snapshot. Keep the local OAuth
+    // onboarding link in the app, but make the static landing page usable.
+    .replace(
+      /href=["']onboarding\/role\?role=candidate(?:&amp;|&)next=\/app\/candidate\/explore["']/g,
+      `href="${prefix}candidate/"`,
+    )
     .replace(
       /<body([^>]*)>/,
       `<body$1><div style="position:sticky;top:0;z-index:9999;padding:9px 16px;background:#eef2ff;color:#3730a3;border-bottom:1px solid #c7d2fe;font:13px/1.5 Arial,sans-serif;text-align:center">GitHub Pages 静态演示快照 · 交互版请按 README 在本地启动</div>`,
